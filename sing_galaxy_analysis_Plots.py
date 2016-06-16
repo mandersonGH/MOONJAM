@@ -2,13 +2,15 @@
 
 from plotGband_defaultFits import *
 from plotD4000_LOGCUBE import *
+from bpt import *
+from plotWHAN import *
 import sys
 import os
 
 opts = []
 
 if len(sys.argv) == 2:
-    opts = ['linear', 'log', 'd4000', 'gband', 'bpt']
+    opts = ['linear', 'log', 'd4000', 'gband', 'bpt', 'whan']
 else:
     opts = [sys.argv[i].lower() for i in range(2, len(sys.argv))]
 
@@ -30,7 +32,7 @@ else:
 print("")
 print("Looking for .fits files in {" + sys.argv[1] + "}")
 for file in os.listdir(sys.argv[1]):
-    if 'bpt' in opts or 'gband' in opts:
+    if 'bpt' in opts or 'gband' in opts or 'whan' in opts:
         if (file.endswith("default.fits") or file.endswith("default.fits.gz")):
             if 'gband' in opts:
                 for i in LOGvec:
@@ -43,6 +45,19 @@ for file in os.listdir(sys.argv[1]):
                           "plots from " + file + "-########################")
                     plotGband_defaultFits(sys.argv[1] + file, i)
 
+            if 'bpt' in opts:
+                print("")
+                print("########################-Making BPT plots from " +
+                      file + "-########################")
+                plotBPT(sys.argv[1] + file)
+
+            if 'whan' in opts:
+                print("")
+                print("########################-Making WHAN plots from " +
+                      file + "-########################")
+                plotWHAN(sys.argv[1] + file)
+
+
     if 'd4000' in opts and (file.endswith("LOGCUBE.fits") or
                             file.endswith("LOGCUBE.fits.gz")):
         print("")
@@ -50,9 +65,9 @@ for file in os.listdir(sys.argv[1]):
               file + "-########################")
         plotD4000_LOGCUBE(sys.argv[1] + file)
 
-if 'bpt' in opts:
-    print("")
-    print("BPT diagram in development, check back later")
+# if 'bpt' in opts:
+#     print("")
+#     print("BPT diagram in development, check back later")
 
 
 # try:

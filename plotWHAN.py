@@ -10,7 +10,7 @@ from sys import argv
 from matplotlib import rc
 
 
-def plotBPT(filename):
+def plotWHAN(filename):
 
     temp = fits.open(filename)
     # for splitting the filename
@@ -20,14 +20,6 @@ def plotBPT(filename):
     # Taking data from GFlux
     headerInd = 1
 
-    # extract OIII and make into 1D array
-    OIII = temp[headerInd].data[3]
-    OIII1D = OIII.reshape(1, OIII.size)
-
-    # extract Hb and make into 1D array
-    Hb = temp[headerInd].data[1]
-    Hb1D = Hb.reshape(1, Hb.size)
-
     # extract NII and make into 1D array
     NII = temp[headerInd].data[6]
     NII1D = NII.reshape(1, NII.size)
@@ -36,9 +28,16 @@ def plotBPT(filename):
     Ha = temp[headerInd].data[7]
     Ha1D = Ha.reshape(1, Ha.size)
 
+    # Taking data from EW
+    headerInd = 11
+
+    # extract EW(Ha) and make into a 1D array
+    EWHa = temp[headerInd].data[7]
+    EWHa1D = EWHa.reshape(1, EWHa.size)
+
     # plot
     logX = np.log(NII1D / Ha1D)
-    logY = np.log(OIII1D / Hb1D)
+    logY = np.log(EWHa1D)
 
     # removing large and small X values
     logX[abs(logX) > 20] = np.NaN
@@ -49,9 +48,9 @@ def plotBPT(filename):
     #plot and save
     plt.figure()
     plt.scatter(logX, logY)
-    plt.title("Spatially Resolved BPT Diagram -- " + name)
+    plt.title("Spatially Resolved WHAN Diagram -- " + name)
     plt.xlabel("log [NII]/H${\\alpha}$")
-    plt.ylabel("log [OIII]/H${\\beta}$")
-    plt.savefig(name_plateNum_Bundle + '_BPT.png')
+    plt.ylabel("log EW(H${\\alpha}$)")
+    plt.savefig(name_plateNum_Bundle + '_WHAN.png')
     # plt.show()
     plt.close()
