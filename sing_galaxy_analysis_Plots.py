@@ -2,7 +2,7 @@
 
 from plotGband_defaultFits import *
 from plotD4000_LOGCUBE import *
-from bpt import *
+from plotBPT import *
 from plotWHAN import *
 import sys
 import os
