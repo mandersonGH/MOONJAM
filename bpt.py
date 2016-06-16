@@ -9,57 +9,48 @@ from astropy.io import fits
 from sys import argv
 from matplotlib import rc
 
-# for taking in user inputed filename
-script, filename = argv
-temp = fits.open(filename)
-# for splitting the filename
-name = (filename.split('/')[-1]).split('.')
-name_plateNum_Bundle = '-'.join(name[0].split('-')[1:3])
 
-# extract OIII and make into 1D array
-OIII = temp[1].data[3]
-OIII1D = OIII.reshape(1, OIII.size)
+def plotBPT(filename):
 
-# extract Hb and make into 1D array
-Hb = temp[1].data[1]
-Hb1D = Hb.reshape(1, Hb.size)
+    temp = fits.open(filename)
+    # for splitting the filename
+    name = (filename.split('/')[-1]).split('.')[0]
+    name_plateNum_Bundle = '-'.join(name.split('-')[1:3])
 
-# extract NII and make into 1D array
-NII = temp[1].data[6]
-NII1D = NII.reshape(1, NII.size)
+    # Taking data from GFlux
+    headerInd = 1
 
-# extract Ha and make into a 1D array
-Ha = temp[1].data[7]
-Ha1D = Ha.reshape(1, Ha.size)
+    # extract OIII and make into 1D array
+    OIII = temp[headerInd].data[3]
+    OIII1D = OIII.reshape(1, OIII.size)
 
-# plot
-logX = np.log(NII1D / Ha1D)
-logY = np.log(OIII1D / Hb1D)
+    # extract Hb and make into 1D array
+    Hb = temp[headerInd].data[1]
+    Hb1D = Hb.reshape(1, Hb.size)
 
-# removing large X values
-for i in range(0, logX.size):
-    if (logX[:, i] > 20):
-        logX[:, i] = np.NaN
+    # extract NII and make into 1D array
+    NII = temp[headerInd].data[6]
+    NII1D = NII.reshape(1, NII.size)
 
-# removing small X values
-for i in range(0, logX.size):
-    if (logX[:, i] < -20):
-        logX[:, i] = np.NaN
+    # extract Ha and make into a 1D array
+    Ha = temp[headerInd].data[7]
+    Ha1D = Ha.reshape(1, Ha.size)
 
-# removing large Y values
-for i in range(0, logY.size):
-    if (logY[:, i] > 20):
-        logY[:, i] = np.NaN
+    # plot
+    logX = np.log(NII1D / Ha1D)
+    logY = np.log(OIII1D / Hb1D)
 
-# removing small Y values
-for i in range(0, logY.size):
-    if (logY[:, i] < -20):
-        logY[:, i] = np.NaN
+    # removing large and small X values
+    logX[abs(logX) > 20] = np.NaN
 
-#plot and save
-plt.scatter(logX, logY)
-plt.title("Spatially Resolved BPT Diagram")
-plt.xlabel("log [NII]/H${\\alpha}$")
-plt.ylabel("log [OIII]/H${\\beta}$")
-plt.savefig(name_plateNum_Bundle + '_BPT.png')
-plt.show()
+    # removing large and small Y values
+    logY[abs(logY) > 20] = np.NaN
+
+    #plot and save
+    plt.figure()
+    plt.scatter(logX, logY)
+    plt.title("Spatially Resolved BPT Diagram -- " + name)
+    plt.xlabel("log [NII]/H${\\alpha}$")
+    plt.ylabel("log [OIII]/H${\\beta}$")
+    plt.savefig(name_plateNum_Bundle + '_BPT.png')
+    plt.show()
