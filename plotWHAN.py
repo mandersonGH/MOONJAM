@@ -14,7 +14,7 @@ def plotWHAN(filename):
 
     temp = fits.open(filename)
 
-    nFP = setupNewDir(filename)
+    nFP = setupNewDir(filename, "")
 
     # for splitting the filename
     name = (filename.split('/')[-1]).split('.')[0]
