@@ -59,13 +59,13 @@ def plotGband_defaultFits(filename, LOGinput):
     for j in range(0, 11):
         GBandNames.append(temp[i].header[31 + j])
     GBandNames = reformatGBandNames(GBandNames)
+    fileLs = '-'.join((((filename.split('/')
+                         [-1]).split('.fits')[0]).split('-'))[1:3])
+
     # cycle through 11 chosen wavelengths
     for j in range(0, 11):
         # print(temp[i].name.split("_")[-1] +
         #       ": " + temp[i].header[31 + j])
-
-        fileLs = '-'.join((((filename.split('/')
-                             [-1]).split('.fits')[0]).split('-'))[1:3])
 
         newFileName = fileLs + '_' + GBandNames[j] + typeStr
 
@@ -137,10 +137,11 @@ def plotGband_defaultFits(filename, LOGinput):
                 typeMod + temp[i].name + ') ' + pixUnit[ii], fontsize=12)
 
             # saving plot to new folder
-            plt.savefig(nFP + '/' + newFileName +
+            plt.savefig(nFP + newFileName +
                         '.png', bbox_inches='tight', dpi=100)
+            plt.close()
     # plt.show()
-    plt.close('all')
+    # plt.close('all')
 
 
 def boundaryMatrix(dataCube):
