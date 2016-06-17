@@ -2,8 +2,7 @@ from astropy.io import fits
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
-import os
-import sys
+import direcFuncs
 
 
 def plotD4000_LOGCUBE(filename):
@@ -11,7 +10,7 @@ def plotD4000_LOGCUBE(filename):
     temp = fits.open(filename)
 
     # setup new directory for figure-saving
-    nFP = setupNewDir(filename)
+    nFP = direcFuncs.setupNewDir(filename, 'D4000', "")
     # setup title for figure and saving
     mainTitle = (filename.split('/')[-1]).split('.fits')[0]
     newFileName = '-'.join(mainTitle.split('-')[1:3])
@@ -110,27 +109,3 @@ def findInds(waveVec):
     topEnd = np.argmin(abs(waveVec - 4250))
 
     return [botStart, botEnd, topStart, topEnd]
-
-
-def setupNewDir(filename):
-    # ensures new folder
-    # sets up folder path for new files
-    # print(filename)
-    fileLs = filename.split('/')
-    # print(fileLs)
-    del fileLs[-1]
-
-    newFldrPath = '/'.join(fileLs) + '/Figures/D4000/'
-    # print(newFldrPath)
-    assure_path_exists(newFldrPath)
-
-    return newFldrPath
-
-
-def assure_path_exists(path):
-    # from
-    # https://justgagan.wordpress.com/2010/09/22/python-create-path-or-directories-if-not-exist/
-    dir = os.path.dirname(path)
-    if not os.path.exists(dir):
-        os.makedirs(dir)
-        print("New directory made {" + dir + "/}")

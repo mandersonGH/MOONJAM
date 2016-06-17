@@ -6,8 +6,7 @@ from astropy.io import fits
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
-import os
-import sys
+import direcFuncs
 
 
 def plotGband_defaultFits(filename, LOGinput):
@@ -54,7 +53,7 @@ def plotGband_defaultFits(filename, LOGinput):
         bMat_master[ii] = boundaryMatrix(temp[i].data)
 
     # setup new directory for figure-saving
-    nFP = setupNewDir(filename, typeStr)
+    nFP = direcFuncs.setupNewDir(filename, 'GBand', typeStr)
     GBandNames = []
     for j in range(0, 11):
         GBandNames.append(temp[i].header[31 + j])
@@ -199,19 +198,6 @@ def whiteOutBndryVals(sliceMat, bMat):
     return sliceMat
 
 
-def setupNewDir(filename, typeStr):
-    # ensures new folder
-    # sets up folder path for new files
-    fileLs = filename.split('/')
-    # newFldrNme = fileLs[-1]
-    del fileLs[-1]
-
-    newFldrPath = '/'.join(fileLs) + '/Figures/GBand' + typeStr + '/'
-    assure_path_exists(newFldrPath)
-
-    return newFldrPath
-
-
 def freqHisto(main):
 
     plt.figure()
@@ -223,15 +209,6 @@ def printSliceInfo(sliceMat):
           ", " + str(np.nanmax(sliceMat)) + "]")
     print("   avg " + str(np.nanmean(sliceMat)))
     print("   std " + str(np.nanstd(sliceMat)))
-
-
-def assure_path_exists(path):
-    # from
-    # https://justgagan.wordpress.com/2010/09/22/python-create-path-or-directories-if-not-exist/
-    dir = os.path.dirname(path)
-    if not os.path.exists(dir):
-        os.makedirs(dir)
-        print("New directory made {" + dir + "/}")
 
 
 def reformatGBandNames(GBandNames):
