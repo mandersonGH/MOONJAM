@@ -5,7 +5,7 @@ from plotD4000_LOGCUBE import *
 from plotBPT import *
 from plotWHAN import *
 import sys
-import os
+import direcFuncs as dF
 
 opts = []
 
@@ -31,48 +31,35 @@ else:
 
 print("")
 print("Looking for .fits files in {" + sys.argv[1] + "}")
-for file in os.listdir(sys.argv[1]):
-    if 'bpt' in opts or 'gband' in opts or 'whan' in opts:
-        if (file.endswith("default.fits") or file.endswith("default.fits.gz")):
-            if 'gband' in opts:
-                for i in LOGvec:
-                    if i == 0:
-                        LOGstr = ' '
-                    else:
-                        LOGstr = ' LOG '
-                    print("")
-                    print("########################-Making GBand" + LOGstr +
-                          "plots from " + file + "-########################")
-                    plotGband_defaultFits(sys.argv[1] + file, i)
 
-            if 'bpt' in opts:
+if 'bpt' in opts or 'gband' in opts or 'whan' in opts:
+    for file in dF.locate("*default.fits", sys.argv[1]) + dF.locate("*default.fits.gz", sys.argv[1]):
+        if 'gband' in opts:
+            for i in LOGvec:
+                if i == 0:
+                    LOGstr = ' '
+                else:
+                    LOGstr = ' LOG '
                 print("")
-                print("########################-Making BPT plots from " +
-                      file + "-########################")
-                plotBPT(sys.argv[1] + file)
+                print("########################-Making GBand" + LOGstr +
+                      "plots from " + file + "-########################")
+                plotGband_defaultFits(file, i)
 
-            if 'whan' in opts:
-                print("")
-                print("########################-Making WHAN plots from " +
-                      file + "-########################")
-                plotWHAN(sys.argv[1] + file)
+        if 'bpt' in opts:
+            print("")
+            print("########################-Making BPT plots from " +
+                  file + "-########################")
+            plotBPT(file)
 
+        if 'whan' in opts:
+            print("")
+            print("########################-Making WHAN plots from " +
+                  file + "-########################")
+            plotWHAN(file)
 
-    if 'd4000' in opts and (file.endswith("LOGCUBE.fits") or
-                            file.endswith("LOGCUBE.fits.gz")):
+if 'd4000' in opts:
+    for file in dF.locate("*LOGCUBE.fits", sys.argv[1]) + dF.locate("*LOGCUBE.fits.gz", sys.argv[1]):
         print("")
         print("########################-Making D4000 plots from " +
               file + "-########################")
-        plotD4000_LOGCUBE(sys.argv[1] + file)
-
-# if 'bpt' in opts:
-#     print("")
-#     print("BPT diagram in development, check back later")
-
-
-# try:
-#     fin = sys.argv[1]
-# except IndexError:
-#     print('Usage: python {0} mangadap-{{plate}}-{{ifu}}-default.fits.gz'
-#           ''.format(sys.argv[0]))
-#     sys.exit(1)
+        plotD4000_LOGCUBE(file)
