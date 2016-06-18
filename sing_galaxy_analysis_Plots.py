@@ -1,7 +1,7 @@
 # create plots for analysis of single galaxy
 
-from plotGband_defaultFits import *
-from plotD4000_LOGCUBE import *
+from plotGband import *
+from plotD4000 import *
 from plotBPT import *
 from plotWHAN import *
 import sys
@@ -43,7 +43,7 @@ if 'bpt' in opts or 'gband' in opts or 'whan' in opts:
                 print("")
                 print("########################-Making GBand" + LOGstr +
                       "plots from " + file + "-########################")
-                plotGband_defaultFits(file, i)
+                plotGband(file, i)
 
         if 'bpt' in opts:
             print("")
@@ -62,4 +62,4 @@ if 'd4000' in opts:
         print("")
         print("########################-Making D4000 plots from " +
               file + "-########################")
-        plotD4000_LOGCUBE(file)
+        plotD4000(file)
