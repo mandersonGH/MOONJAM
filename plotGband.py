@@ -12,7 +12,7 @@ import dataCorrection as dC
 import plotHexagon
 
 
-def plotGband_defaultFits(filename, LOGinput):
+def plotGband(filename, LOGinput):
     # typeStr will indicate to do normal or log plots
     typeStr = ''
     typeMod = '('
