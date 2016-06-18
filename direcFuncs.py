@@ -1,5 +1,6 @@
 # generic directory functions
 import os
+import fnmatch
 
 
 def setupNewDir(filename, newFolderName, typeStr):
@@ -23,3 +24,11 @@ def assure_path_exists(path):
     if not os.path.exists(dir):
         os.makedirs(dir)
         print("New directory made {" + dir + "/}")
+
+
+def locate(pattern, rootD=os.curdir):
+    matches = []
+    for root, dirnames, filenames in os.walk(rootD):
+        for filename in fnmatch.filter(filenames, pattern):
+            matches.append(os.path.join(root, filename))
+    return matches
