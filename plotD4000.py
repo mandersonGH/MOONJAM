@@ -7,7 +7,7 @@ import dataCorrection as dC
 import plotHexagon
 
 
-def plotD4000_LOGCUBE(filename):
+def plotD4000(filename):
     # open file
     temp = fits.open(filename)
 
