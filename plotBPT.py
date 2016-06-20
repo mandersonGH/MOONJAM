@@ -72,7 +72,7 @@ def plotBPT(filename):
     plt.ylabel("log [OIII]/H${\\beta}$")
     plt.annotate('Sy', xy=(-1,2), size= '18', color='r')	
     plt.annotate('SF', xy=(-3,-2), size= '18', color='m')
-	plt.annotate('SF', xy=(-.20,-1.75), size= '18', color='g')
+    plt.annotate('SF', xy=(-.20,-1.75), size= '18', color='g')
     plt.plot(x1,y1, 'k')
     plt.plot(x2,y2, '--k')
     plt.savefig(nFP + name_plateNum_Bundle + '_BPT.png')
