@@ -2,7 +2,7 @@
 import warnings
 warnings.filterwarnings("ignore")
 
-#import statements
+# import statements
 import numpy as np
 import matplotlib.pyplot as plt
 from astropy.io import fits
@@ -48,23 +48,29 @@ def plotWHAN(filename):
     # removing large and small Y values
     logY[abs(logY) > 20] = np.NaN
 
-    #demarkations
-    demarkX1=[-6, 6]
-    demarkY1=[.5, .5]
-    demarkX2=[-.4, -.4]
-    demarkY2=[.5,10]
-
-    #plot and save
+    # plot and save
     plt.figure()
     plt.scatter(logX, logY)
+    axes = plt.gca()
+    xmin, xmax = axes.get_xlim()
+    ymin, ymax = axes.get_ylim()
+
+    # demarkations
+    demarkX1 = [xmin, xmax]
+    demarkY1 = [.5, .5]
+    demarkX2 = [-.4, -.4]
+    demarkY2 = [.5, ymax]
+
     plt.plot(demarkX1, demarkY1, 'k')
     plt.plot(demarkX2, demarkY2, 'k')
+    plt.xlim([xmin, xmax])
+    plt.ylim([ymin, ymax])
     plt.title("Spatially Resolved WHAN Diagram -- " + name)
     plt.xlabel("log [NII]/H${\\alpha}$")
     plt.ylabel("log EW(H${\\alpha}$)")
-    plt.annotate('SF', xy=(-3, 8))
-    plt.annotate('AGN', xy=(4, 8))
-    plt.annotate('Old Stars', xy=(-3, 0))
+    plt.annotate('SF', xy=((-0.4 + xmin) / 2, (0.5 + ymax) * 0.75))
+    plt.annotate('AGN', xy=((-0.4 + xmax) / 2, (0.5 + ymax) * 0.75))
+    plt.annotate('Old Stars', xy=((xmin + xmax) * 0.5, (ymin + 0.5) * 0.25))
     plt.savefig(nFP + name_plateNum_Bundle + '_WHAN.png')
     # plt.show()
     plt.close()
