@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 import direcFuncs
 import dataCorrection as dC
-import plotHexagon
+import plottingTools as pT
 
 
 def plotGband(filename, LOGinput):
@@ -22,6 +22,8 @@ def plotGband(filename, LOGinput):
 
     # open file
     temp = fits.open(filename)
+    fiberNo = int((str(temp[0].header[51]))[
+                  :(str(temp[0].header[51])).find('0')])
 
     # temp.info()
 
@@ -30,8 +32,8 @@ def plotGband(filename, LOGinput):
     iAr = [1, 11]
     # for ii in range(0, 2):
     #     i = iAr[ii]
-    # print(temp[i].name)
-    # print(temp[1].header.keys)
+    # print(temp[0].name)
+    # print(temp[0].header.keys)
 
     # setup new directory for figure-saving
     nFP = direcFuncs.setupNewDir(filename, 'GBand', typeStr)
@@ -100,27 +102,10 @@ def plotGband(filename, LOGinput):
 
             ######### axis business ############
 
-            # # to be done once axis labels are found
-            # axis1_lbl = temp[i].header[17]
-            # axis2_lbl = temp[i].header[18]
-            # plt.xlabel(axis1_lbl)
-            # plt.ylabel(axis2_lbl)
+            plt.xlabel("arcsec")
+            plt.ylabel("arcsec")
 
-            axis1_n = temp[i].header[3]
-            axis2_n = temp[i].header[4]
-            refPnt = [temp[i].header[9], temp[i].header[10]]
-            axis1 = np.linspace(0, axis1_n, axis1_n + 1) - refPnt[0]
-            axis2 = np.linspace(0, axis2_n, axis2_n + 1) - refPnt[1]
-
-            dx = 1
-            dy = 1
-            xmin = min(axis1)
-            xmax = max(axis1)
-            ymin = min(axis2)
-            ymax = max(axis2)
-
-            x2, y2 = np.meshgrid(np.arange(
-                xmin, xmax + dx, dx) - dx / 2., np.arange(ymin, ymax + dy, dy) - dy / 2.)
+            x2, y2 = pT.createAxis(fiberNo, temp[i].header, 'default')
 
             plt.axis([x2.min() - 1, x2.max() + 1, y2.min() - 1, y2.max() + 1])
 
