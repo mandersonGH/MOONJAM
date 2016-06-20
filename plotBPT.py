@@ -49,12 +49,28 @@ def plotBPT(filename):
     # removing large and small Y values
     logY[abs(logY) > 20] = np.NaN
 
+    #for demarkations
+    x1=[]
+    x2=[]
+    y1=[]
+    y2=[]
+    c=np.linspace(-10,10,100)
+    for i in c:
+    	if(i<.47):
+	    	x2.append(i)
+	    	y2.append(0.61/(i-0.47) + 1.19)
+    	if(i<0.05 and i>-1.2805):
+	    	y1.append(0.61/(i-0.05) + 1.3)
+	    	x1.append(i)	
+
     #plot and save
     plt.figure()
     plt.scatter(logX, logY)
     plt.title("Spatially Resolved BPT Diagram -- " + name)
     plt.xlabel("log [NII]/H${\\alpha}$")
     plt.ylabel("log [OIII]/H${\\beta}$")
+    plt.plot(x1,y1, '--k')
+    plt.plot(x2,y2, 'k')
     plt.savefig(nFP + name_plateNum_Bundle + '_BPT.png')
     # plt.show()
     plt.close()
