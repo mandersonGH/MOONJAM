@@ -51,3 +51,17 @@ def createAxis(fiberNo, tempHeader, dataType):
 
     return np.meshgrid(np.arange(xmin, xmax + dx, dx) -
                        dx / 2., np.arange(ymin, ymax + dy, dy) - dy / 2.)
+
+
+def calculateDistance(x1, y1, x2, y2):
+    return np.sqrt(np.square(x2 - x1) + np.square(y2 - y1))
+
+
+def createDistanceMatrix(dataShape, refPnt, SPAX):
+    disMat = np.zeros(dataShape)
+    for i in range(0, dataShape[0]):
+        for j in range(0, dataShape[1]):
+            disMat[i, j] = calculateDistance(
+                i * SPAX[0], j * SPAX[1], refPnt[0] * SPAX[0], refPnt[1] * SPAX[1])
+
+    return disMat
