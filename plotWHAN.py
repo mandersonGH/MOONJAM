@@ -48,9 +48,17 @@ def plotWHAN(filename):
     # removing large and small Y values
     logY[abs(logY) > 20] = np.NaN
 
+    #demarkations
+    demarkX1=[-6, 6]
+    demarkY1=[.5, .5]
+    demarkX2=[-.4, -.4]
+    demarkY2=[.5,10]
+
     #plot and save
     plt.figure()
     plt.scatter(logX, logY)
+    plt.plot(demarkX1, demarkY1, 'k')
+    plt.plot(demarkX2, demarkY2, 'k')
     plt.title("Spatially Resolved WHAN Diagram -- " + name)
     plt.xlabel("log [NII]/H${\\alpha}$")
     plt.ylabel("log EW(H${\\alpha}$)")
