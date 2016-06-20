@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 import direcFuncs
 import dataCorrection as dC
-import plotHexagon
+import plottingTools as pT
 
 
 def plotD4000(filename):
@@ -18,6 +18,9 @@ def plotD4000(filename):
     newFileName = '-'.join(mainTitle.split('-')[1:3])
 
     # temp.info()
+
+    fiberNo = int((str(temp[0].header[55]))[
+                  :(str(temp[0].header[55])).find('0')])
 
     # extract dataCube and wavelength vector
     dataCube = temp[1].data
@@ -44,34 +47,13 @@ def plotD4000(filename):
             ratioMat[i, j] = topMean / botMean
     ######### axis business ############
 
-    # # to be done once axis labels are found
-    # axis1_lbl = temp[i].header[17]
-    # axis2_lbl = temp[i].header[18]
-    # plt.xlabel(axis1_lbl)
-    # plt.ylabel(axis2_lbl)
-
-    axis1_n = temp[1].header[3]
-    axis2_n = temp[1].header[4]
-    refPnt = [temp[1].header[81], temp[1].header[82]]
-    axis1 = np.linspace(0, axis1_n, axis1_n + 1) - refPnt[0]
-    axis2 = np.linspace(0, axis2_n, axis2_n + 1) - refPnt[1]
-
-    dx = 1
-    dy = 1
-    xmin = min(axis1)
-    xmax = max(axis1)
-    ymin = min(axis2)
-    ymax = max(axis2)
-
-    x2, y2 = np.meshgrid(np.arange(
-        xmin, xmax + dx, dx) - dx / 2., np.arange(ymin, ymax + dy, dy) - dy / 2.)
+    x2, y2 = pT.createAxis(fiberNo, temp[1].header, 'LOGCUBE')
 
     ########### plotting three different figures ############
 
     for i in range(0, 3):
 
         plt.figure()
-        axes = plt.subplot(111)
 
         # plotHexagon.plotHexagon([(0, 0)], 105000, axes)
 
@@ -103,6 +85,8 @@ def plotD4000(filename):
         plt.colorbar()
 
         plt.axis([x2.min(), x2.max(), y2.min(), y2.max()])
+        plt.xlabel("arcsec")
+        plt.ylabel("arcsec")
 
         ############ cross hairs lines ###############
 
