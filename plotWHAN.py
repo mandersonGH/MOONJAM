@@ -6,19 +6,29 @@ warnings.filterwarnings("ignore")
 import numpy as np
 import matplotlib.pyplot as plt
 from astropy.io import fits
-from matplotlib import rc
-import os
+import direcFuncs as dF
+import plottingTools as pT
 
 
 def plotWHAN(filename):
 
     temp = fits.open(filename)
+    # temp.info()
+    # for i in range(0, 10):
+    #     print(temp[i].header.keys)
 
-    nFP = setupNewDir(filename, "")
+    nFP = dF.setupNewDir(filename, "", 'WHAN')
 
     # for splitting the filename
     name = (filename.split('/')[-1]).split('.')[0]
     name_plateNum_Bundle = '-'.join(name.split('-')[1:3])
+
+    axis1_n = temp[1].header[3]
+    axis2_n = temp[1].header[4]
+    refPnt = [temp[1].header[9], temp[1].header[10]]
+    SPAXD_vec = [temp[0].header[72], temp[0].header[73]]
+
+    dMat = pT.createDistanceMatrix([axis1_n, axis2_n], refPnt, SPAXD_vec)
 
     # Taking data from GFlux
     headerInd = 1
@@ -50,7 +60,9 @@ def plotWHAN(filename):
 
     # plot and save
     plt.figure()
-    plt.scatter(logX, logY)
+    plt.scatter(logX, logY, c=dMat, cmap=plt.cm.plasma)
+    cbar = plt.colorbar()
+    cbar.set_label("arcsec")
     axes = plt.gca()
     xmin, xmax = axes.get_xlim()
     ymin, ymax = axes.get_ylim()
@@ -74,25 +86,3 @@ def plotWHAN(filename):
     plt.savefig(nFP + name_plateNum_Bundle + '_WHAN.png')
     # plt.show()
     plt.close()
-
-
-def setupNewDir(filename, typeStr):
-    # ensures new folder
-    # sets up folder path for new files
-    fileLs = filename.split('/')
-    # newFldrNme = fileLs[-1]
-    del fileLs[-1]
-
-    newFldrPath = '/'.join(fileLs) + '/Figures/WHAN' + typeStr + '/'
-    assure_path_exists(newFldrPath)
-
-    return newFldrPath
-
-
-def assure_path_exists(path):
-    # from
-    # https://justgagan.wordpress.com/2010/09/22/python-create-path-or-directories-if-not-exist/
-    dir = os.path.dirname(path)
-    if not os.path.exists(dir):
-        os.makedirs(dir)
-        print("New directory made {" + dir + "/}")

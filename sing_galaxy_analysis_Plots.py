@@ -33,7 +33,7 @@ else:
     LOGvec = [0, 1]
 
 print("")
-print("Looking for .fits files in {" + sys.argv[1] + "}")
+print("Looking for .fits files in {" + sys.argv[1] + " and its subfolders}")
 
 if 'bpt' in opts or 'gband' in opts or 'whan' in opts:
     for file in dF.locate("*default.fits", sys.argv[1]) + dF.locate("*default.fits.gz", sys.argv[1]):

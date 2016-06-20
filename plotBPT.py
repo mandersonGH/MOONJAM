@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from astropy.io import fits
 from matplotlib import rc
 import direcFuncs
+import plottingTools as pT
 
 
 def plotBPT(filename):
@@ -22,6 +23,13 @@ def plotBPT(filename):
 
     # Taking data from GFlux
     headerInd = 1
+
+    axis1_n = temp[1].header[3]
+    axis2_n = temp[1].header[4]
+    refPnt = [temp[1].header[9], temp[1].header[10]]
+    SPAXD_vec = [temp[0].header[72], temp[0].header[73]]
+
+    dMat = pT.createDistanceMatrix([axis1_n, axis2_n], refPnt, SPAXD_vec)
 
     # extract OIII and make into 1D array
     OIII = temp[headerInd].data[3]
@@ -66,7 +74,10 @@ def plotBPT(filename):
 
     #plot and save
     plt.figure()
-    plt.scatter(logX, logY)
+    plt.scatter(logX, logY, c=dMat, cmap=plt.cm.plasma)
+    cbar = plt.colorbar()
+    cbar.set_label("arcsec")
+
     axes = plt.gca()
     xmin, xmax = axes.get_xlim()
     ymin, ymax = axes.get_ylim()
