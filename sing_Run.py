@@ -40,7 +40,7 @@ def optsPrompt():
 
 if len(sys.argv) == 1:
     print("Welcome to the single galaxy analysis for MaNGA .fits file")
-    print("Produced by MOONJAM")
+    print("Produced by MOONJAM 2016")
     pwd = 'NO'
     while os.path.isdir(pwd) is False:
         pwd = raw_input(
