@@ -60,24 +60,24 @@ def plotD4000(filename):
         ratioMat4Plot = np.array(ratioMat)
 
         if i == 2:
-            ratioMat4Plot = dC.whiteFlaggedVals(ratioMat4Plot)
+            ratioMat4Plot = dC.maskInvalidFlaggedVals(ratioMat4Plot)
             cmapD = colors.ListedColormap(['red', 'blue'])
             bounds = [0.5, 1.6, 3]
             norm = colors.BoundaryNorm(bounds, cmapD.N)
             plt.pcolormesh(x2, y2, ratioMat4Plot, cmap=cmapD, norm=norm)
         else:
             cmapD = plt.cm.plasma
-            cmapD.set_bad(alpha=0.0)
+            cmapD.set_bad('0.75')
             if i == 0:
                 vmin = 0.5
                 vmax = 3
-                ratioMat4Plot = dC.whiteFlaggedVals(ratioMat4Plot)
+                ratioMat4Plot = dC.maskInvalidFlaggedVals(ratioMat4Plot)
 
             elif i == 1:
                 vmin = 0.75
                 vmax = 1.6
                 ratioMatSF = dC.flagHighValues(ratioMat4Plot, 1.6)
-                ratioMat4Plot = dC.whiteFlaggedVals(ratioMatSF)
+                ratioMat4Plot = dC.maskInvalidFlaggedVals(ratioMatSF)
 
             plt.pcolormesh(x2, y2, ratioMat4Plot, cmap=cmapD,
                            vmin=vmin, vmax=vmax)

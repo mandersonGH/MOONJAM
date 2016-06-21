@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def eliminateNegatives(dataIn):
+def zeroOutNegatives(dataIn):
     dataIn[dataIn < 0] = 0
     return dataIn
 
@@ -39,7 +39,7 @@ def flagOutlierValues(dataIn):
     return dataIn
 
 
-def whiteFlaggedVals(dataIn):
+def maskInvalidFlaggedVals(dataIn):
     dataIn = np.ma.masked_invalid(dataIn)
     return dataIn
 

@@ -65,7 +65,7 @@ def plotGband(filename, LOGinput):
 
             # dC.printDataInfo(sliceMat)
 
-            sliceMat = dC.eliminateNegatives(sliceMat)
+            sliceMat = dC.zeroOutNegatives(sliceMat)
 
             sliceMat = dC.flagOutsideZeros(sliceMat)
 
@@ -80,7 +80,7 @@ def plotGband(filename, LOGinput):
                 sliceMat[sliceMat < .05] = np.NaN
                 sliceMat = np.log10(sliceMat)
 
-            sliceMat = dC.whiteFlaggedVals(sliceMat)
+            sliceMat = dC.maskInvalidFlaggedVals(sliceMat)
 
             ########### limits on colorbar ############
 
@@ -116,7 +116,7 @@ def plotGband(filename, LOGinput):
             ############## plotting and colormap ############
             # cmap1 = plt.cm.viridis
             cmap1 = plt.cm.plasma
-            cmap1.set_bad(alpha=0.0)
+            cmap1.set_bad('0.75')
             # cmap.set_over()
             # cmap.set_under('0.75', 1)
 
