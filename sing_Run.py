@@ -7,6 +7,7 @@ from plotWHAN import *
 import sys
 import direcFuncs as dF
 import time
+import os
 
 
 opts = []
@@ -41,7 +42,7 @@ if len(sys.argv) == 1:
     print("Welcome to the single galaxy analysis for MaNGA .fits file")
     print("Produced by MOONJAM")
     pwd = 'NO'
-    while os.isdir(pwd) is False:
+    while os.path.isdir(pwd) is False:
         pwd = raw_input(
             "Please enter the directory in which your .fits files are located: ")
     subAns = 'x'
