@@ -26,9 +26,15 @@ def assure_path_exists(path):
         print("New directory made {" + dir + "/}")
 
 
-def locate(pattern, rootD=os.curdir):
+def locate(pattern, subBin, rootD=os.curdir):
     matches = []
-    for root, dirnames, filenames in os.walk(rootD):
-        for filename in fnmatch.filter(filenames, pattern):
-            matches.append(os.path.join(root, filename))
+    if subBin is True:
+        for root, dirnames, filenames in os.walk(rootD):
+            for filename in fnmatch.filter(filenames, pattern):
+                matches.append(os.path.join(root, filename))
+    else:
+        pattern = pattern[1:len(pattern)]
+        for file in os.listdir(rootD):
+            if file.endswith(pattern):
+                matches.append(rootD + file)
     return matches
