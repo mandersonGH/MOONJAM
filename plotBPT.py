@@ -76,7 +76,7 @@ def plotBPT(filename):
     plt.figure()
     plt.scatter(logX, logY, c=dMat, cmap=plt.cm.plasma)
     cbar = plt.colorbar()
-    cbar.set_label("arcsec")
+    cbar.set_label("arcsec from center")
 
     axes = plt.gca()
     xmin, xmax = axes.get_xlim()
