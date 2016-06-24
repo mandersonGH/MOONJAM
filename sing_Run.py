@@ -4,6 +4,9 @@ from plotGband import *
 from plotD4000 import *
 from plotBPT import *
 from plotWHAN import *
+from plotHDA import *
+from plotSFH import *
+from plotSSP import *
 import sys
 import direcFuncs as dF
 import time
@@ -28,6 +31,7 @@ def optsPrompt():
     print("     For files ending in 'LOGCUBE.fits' or 'LOGCUBE.fits.gz':")
     print("")
     print("         D4000 -- Spatial Resolution of D4000")
+    print("         HDA -- Spatial Resolution of Hydrogen Delta Absorption Line")
     print("")
     print("Options Example: GBand Linear LOG WHAN")
     print("     This would produce linear and LOG_10 plots for GBand and also a WHAN diagram")
@@ -54,11 +58,12 @@ else:
     pwd = sys.argv[1]
     subAns = 'Y'
     if len(sys.argv) == 2:
-        opts = ['linear', 'log', 'd4000', 'gband', 'bpt', 'whan']
+        opts = ['linear', 'log', 'd4000', 'gband',
+                'bpt', 'whan', 'hda', 'sfh', 'ssp']
     else:
         opts = [sys.argv[i].lower() for i in range(2, len(sys.argv))]
 
-while 'bpt' not in opts and 'gband' not in opts and 'whan' not in opts and 'd4000' not in opts:
+while 'bpt' not in opts and 'gband' not in opts and 'whan' not in opts and 'd4000' not in opts and 'hda' not in opts and 'sfh' not in opts and 'ssp' not in opts:
     opts = optsPrompt()
 
 start = time.time()
@@ -113,11 +118,28 @@ if 'bpt' in opts or 'gband' in opts or 'whan' in opts:
             print("##########-Making WHAN plots from " + file + "-##########")
             plotWHAN(file)
 
-if 'd4000' in opts:
+if 'd4000' in opts or 'hda' in opts:
     for file in dF.locate("*LOGCUBE.fits", subBin, pwd) + dF.locate("*LOGCUBE.fits.gz", subBin, pwd):
-        print("")
-        print("##########-Making D4000 plots from " + file + "-##########")
-        plotD4000(file)
+        if 'd4000' in opts:
+            print("")
+            print("##########-Making D4000 plots from " + file + "-##########")
+            plotD4000(file)
+        if 'hda' in opts:
+            print("")
+            print("##########-Making HDA plots from " + file + "-##########")
+            plotHDA(file)
+
+# if 'sfh' in opts:
+#     for file in dF.locate("*SFH.cube.fits", subBin, pwd) + dF.locate("*SFH.cube.fits.gz", subBin, pwd):
+#         print("")
+#         print("##########-Making SFH plots from " + file + "-##########")
+#         plotSFH(file)
+
+# if 'ssp' in opts:
+#     for file in dF.locate("*SSP.cube.fits", subBin, pwd) + dF.locate("*SSP.cube.fits.gz", subBin, pwd):
+#         print("")
+#         print("##########-Making SSP plots from " + file + "-##########")
+#         plotSSP(file)
 
 end = time.time()
 print("The time elapsed is " + str(end - start) + " seconds")

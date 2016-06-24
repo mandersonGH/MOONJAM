@@ -33,11 +33,10 @@ def plotD4000(filename):
     ratioMat = np.zeros([dataCube.shape[0], dataCube.shape[1]])
 
     # pick wavelength ranges to measure D4000 ratio
-    indVec = findInds(waveVec)
-    botStart = indVec[0]
-    botEnd = indVec[1]
-    topStart = indVec[2]
-    topEnd = indVec[3]
+    botStart = pT.findIndex(waveVec, 3750)
+    botEnd = pT.findIndex(waveVec, 3950)
+    topStart = pT.findIndex(waveVec, 4050)
+    topEnd = pT.findIndex(waveVec, 4250)
 
     # cycle through spaxels and find ratio
     for i in range(0, dataCube.shape[0]):
@@ -100,13 +99,3 @@ def plotD4000(filename):
 
     # plt.show()
     plt.close('all')
-
-
-def findInds(waveVec):
-
-    botStart = np.argmin(abs(waveVec - 3750))
-    botEnd = np.argmin(abs(waveVec - 3950))
-    topStart = np.argmin(abs(waveVec - 4050))
-    topEnd = np.argmin(abs(waveVec - 4250))
-
-    return [botStart, botEnd, topStart, topEnd]
