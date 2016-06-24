@@ -33,11 +33,10 @@ def flagHighValues(dataIn, value):
     return dataIn
 
 
-def flagOutlierValues(dataIn):
-    devs = 10
+def flagOutlierValues(dataIn, devs):
     dataIn[dataIn > np.nanmean(dataIn) + devs * np.nanstd(dataIn)] = np.NaN
+    dataIn[dataIn < np.nanmean(dataIn) - devs * np.nanstd(dataIn)] = np.NaN   
     return dataIn
-
 
 def maskInvalidFlaggedVals(dataIn):
     dataIn = np.ma.masked_invalid(dataIn)
