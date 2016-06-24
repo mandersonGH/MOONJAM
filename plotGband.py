@@ -65,9 +65,9 @@ def plotGband(filename, LOGinput):
 
             # dC.printDataInfo(sliceMat)
 
-            sliceMat = dC.zeroOutNegatives(sliceMat)
-
             sliceMat = dC.flagOutsideZeros(sliceMat)
+
+            sliceMat = dC.zeroOutNegatives(sliceMat)
 
             sliceMat = dC.flagHighValues(sliceMat, 300.0)
 

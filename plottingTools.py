@@ -26,14 +26,15 @@ def createAxis(fiberNo, tempHeader, dataType):
     # axis1_lbl = temp[i].header[17]
     # axis2_lbl = temp[i].header[18]
 
+    axis1_n = tempHeader[3]
+    axis2_n = tempHeader[4]
+
     if dataType is 'LOGCUBE':
-        axis1_n = tempHeader[3]
-        axis2_n = tempHeader[4]
         refPnt = [tempHeader[81], tempHeader[82]]
     elif dataType is 'default':
-        axis1_n = tempHeader[3]
-        axis2_n = tempHeader[4]
         refPnt = [tempHeader[9], tempHeader[10]]
+    else:
+        refPnt = [0, 0]
 
     axis1 = np.linspace(0, axis1_n, axis1_n + 1) - refPnt[0]
     axis2 = np.linspace(0, axis2_n, axis2_n + 1) - refPnt[1]
@@ -65,3 +66,8 @@ def createDistanceMatrix(dataShape, refPnt, SPAX):
                 i * SPAX[0], j * SPAX[1], refPnt[0] * SPAX[0], refPnt[1] * SPAX[1])
 
     return disMat
+
+
+def findIndex(waveVec, wavelength):
+    index = np.argmin(abs(waveVec - wavelength))
+    return index
