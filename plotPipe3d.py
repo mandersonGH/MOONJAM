@@ -7,15 +7,9 @@ import dataCorrection as dC
 
 script, filename=argv
 
-
 def plotPipe3D(filename):
 	temp=fits.open(filename)
 	dataCube=temp[0].data
-
-	for i in range(109):
-	        print(str(i) + " -- " +
-	              str(temp[0].header.keys()[i]) + " -- " + str(temp[0].header[i]))
-
 	units={}
 	desc={}
 	ID={}
