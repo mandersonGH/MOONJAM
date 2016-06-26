@@ -36,7 +36,8 @@ def plotHDA(filename):
     # create empty ratio matrix of correct shape
 
     # pick wavelength ranges to measure D4000 ratio
-    index = pT.findIndex(waveVec, 4101.75)
+    wavelength = 4101.75
+    index = pT.findIndex(waveVec, wavelength)
     # print(index)
     # print(waveVec[index-3:index+3])
     # print(dataCube[index].shape)
@@ -56,15 +57,17 @@ def plotHDA(filename):
     ########### plotting three different figures ############
 
     plt.figure()
+    axes = plt.subplot(1, 1, 1)
 
     cmapD = plt.cm.plasma
+    cmapD.set_bad('0.75')
 
     plt.pcolormesh(x2, y2, sliceMat, cmap=cmapD)
 
     cbar = plt.colorbar()
     cbar.set_label(temp[1].header[19])
 
-    plt.axis([x2.min(), x2.max(), y2.min(), y2.max()])
+    plt.axis([x2.min() - 1, x2.max() + 1, y2.min() - 1, y2.max() + 1])
     plt.xlabel("arcsec")
     plt.ylabel("arcsec")
 
@@ -73,7 +76,14 @@ def plotHDA(filename):
     plt.plot([x2.min(), x2.max()], [0, 0], 'k')
     plt.plot([0, 0], [y2.min(), y2.max()], 'k')
 
-    plt.suptitle(mainTitle + '_HDA', fontsize=17)
+    # additionalTitleComponents = "${\\lambda}$" + str(wavelength)
+
+    # plt.suptitle("H${\\delta}_A$", fontsize=17)
+    # axes.set_title("H${\\delta}_A$", fontsize=17)
+    plt.title("H${\\delta}_A$", fontsize=17)
+
+    plt.annotate("Plate-IFU: " + "-".join(mainTitle.split('-')
+                                          [1:3]), xy=(x2.min() + len(x2) * 0.01, y2.min() + len(y2) * 0.01), size=10)
 
     plt.savefig(nFP + newFileName +
                 '_HDA_' + '.png', bbox_inches='tight', dpi=100)

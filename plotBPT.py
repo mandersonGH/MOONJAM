@@ -85,7 +85,7 @@ def plotBPT(filename):
     x1_at_yHalf = np.argmin(abs(y1 - ymin / 2))
     x2_at_yHalf = np.argmin(abs(y2 - ymin / 2))
 
-    plt.title("Spatially Resolved BPT Diagram -- " + name)
+    plt.title("BPT Diagram", fontsize=17)
     plt.xlabel("log [NII]/H${\\alpha}$")
     plt.ylabel("log [OIII]/H${\\beta}$")
     plt.annotate('Sy', xy=((x1[x1_at_yHalf] + x2[x2_at_yHalf]) * 0.5,
@@ -94,10 +94,12 @@ def plotBPT(filename):
                            ymin / 2), size='18', color='m')
     plt.annotate('Inter', xy=((x1[x1_at_yHalf] + x2[x2_at_yHalf])
                               * 0.5, ymin / 2), size='12', color='g')
+    plt.annotate("Plate-IFU: " + name_plateNum_Bundle, xy=(xmin +
+                                                           (xmax - xmin) * 0.015, ymin + (ymax - ymin) * 0.015), size=10)
     plt.plot(x1, y1, 'k')
     plt.plot(x2, y2, '--k')
     plt.xlim([xmin, xmax])
     plt.ylim([ymin, ymax])
-    plt.savefig(nFP + name_plateNum_Bundle + '_BPT.png')
+    plt.savefig(nFP + name_plateNum_Bundle + '_BPT.png', bbox_inches='tight')
     # plt.show()
     plt.close()

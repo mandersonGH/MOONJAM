@@ -35,8 +35,9 @@ def flagHighValues(dataIn, value):
 
 def flagOutlierValues(dataIn, devs):
     dataIn[dataIn > np.nanmean(dataIn) + devs * np.nanstd(dataIn)] = np.NaN
-    dataIn[dataIn < np.nanmean(dataIn) - devs * np.nanstd(dataIn)] = np.NaN   
+    dataIn[dataIn < np.nanmean(dataIn) - devs * np.nanstd(dataIn)] = np.NaN
     return dataIn
+
 
 def maskInvalidFlaggedVals(dataIn):
     dataIn = np.ma.masked_invalid(dataIn)
@@ -48,6 +49,14 @@ def checkFreqHisto(dataIn, title):
     plt.hist(dataIn[~np.isnan(dataIn)], bins=np.arange(
         np.nanmin(dataIn), np.nanmax(dataIn) + 1, 1))
     plt.title(title)
+
+
+def pickVMIN(dataIn, devs):
+    return np.nanmean(dataIn) - devs * np.nanstd(dataIn)
+
+
+def pickVMAX(dataIn, devs):
+    return np.nanmean(dataIn) + devs * np.nanstd(dataIn)
 
 
 def printDataInfo(dataIn):
