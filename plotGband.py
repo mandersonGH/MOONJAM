@@ -15,10 +15,8 @@ import plottingTools as pT
 def plotGband(filename, LOGinput):
     # typeStr will indicate to do normal or log plots
     typeStr = ''
-    typeMod = '('
     if LOGinput == 1:
         typeStr = '_LOG'
-        typeMod = 'Lg('
 
     # open file
     temp = fits.open(filename)
@@ -44,8 +42,12 @@ def plotGband(filename, LOGinput):
     GBandNames = []
     for j in range(0, 11):
         GBandNames.append(temp[iAr[1]].header[31 + j])
-    GBandNames = reformatGBandNames(GBandNames)
+    tempVec = reformatGBandNames(GBandNames)
+    GBandNames = tempVec[0]
+    GBandFancyNames = tempVec[1]
 
+    # print(GBandNames)
+    # print(GBandFancyNames)
     # cycle through 11 chosen wavelengths
     for j in range(0, 11):
         # print(temp[i].name.split("_")[-1] +
@@ -71,16 +73,14 @@ def plotGband(filename, LOGinput):
 
             sliceMat = dC.flagHighValues(sliceMat, 300.0)
 
-            sliceMat = dC.flagOutlierValues(sliceMat)
+            sliceMat = dC.flagOutlierValues(sliceMat, 10)
 
             # dC.checkFreqHisto(sliceMat, temp[i].name + " " + GBandNames[j])
 
-            if typeStr is '_LOG':
+            if LOGinput == 1:
                 # if LOG then log the data
                 sliceMat[sliceMat < .05] = np.NaN
                 sliceMat = np.log10(sliceMat)
-
-            sliceMat = dC.maskInvalidFlaggedVals(sliceMat)
 
             ########### limits on colorbar ############
 
@@ -91,14 +91,23 @@ def plotGband(filename, LOGinput):
             if typeStr is '':
                 vmin = 0
             else:
-                vmin = np.nanmin(sliceMat) + 1 * np.nanstd(sliceMat)
+                vmin = dC.pickVMIN(sliceMat, 1)
 
-            ######## get plot ready #########
+            sliceMat = dC.maskInvalidFlaggedVals(sliceMat)
+
+            ########  #########
             axes = plt.subplot(1, 2, ii + 1)
-            plt.suptitle(((filename.split(
-                '/')[-1]).split('.fits')[0]) + " " + typeMod + GBandNames[j] + ")", fontsize=17)
-            axes.set_title(
-                typeMod + temp[i].name + ')', fontsize=12)
+
+            ##### Plot titles ########
+
+            plt.suptitle(GBandFancyNames[j], fontsize=17)
+
+            if LOGinput == 0:
+                axes.set_title(GBandFancyNames[
+                               j] + " " + temp[i].name.split("_")[1], fontsize=12)
+            elif LOGinput == 1:
+                axes.set_title(
+                    "log (" + GBandFancyNames[j] + " " + temp[i].name.split("_")[1] + ")", fontsize=12)
 
             ######### axis business ############
 
@@ -132,6 +141,10 @@ def plotGband(filename, LOGinput):
             plt.plot([x2.min(), x2.max()], [0, 0], 'k')
             plt.plot([0, 0], [y2.min(), y2.max()], 'k')
 
+            ########### plateIFU annotiation ##############
+            plt.annotate("Plate-IFU: " + fileLs, xy=(x2.min() +
+                                                     len(x2) * 0.01, y2.min() + len(y2) * 0.01), size=10)
+
             ########## saving plot to new folder #############
             plt.savefig(nFP + newFileName +
                         '.png', bbox_inches='tight', dpi=100)
@@ -141,10 +154,22 @@ def plotGband(filename, LOGinput):
 
 
 def reformatGBandNames(GBandNames):
+    GBandFancyNames = [""] * len(GBandNames)
+    greekLet = ""
     for i in range(0, len(GBandNames)):
         tempVec = GBandNames[i].split('-')
         if GBandNames[i].startswith("H"):
             GBandNames[i] = tempVec[0] + "____" + tempVec[-1]
+            if GBandNames[i][1] == 'a':
+                greekLet = '${\\alpha}$'
+            elif GBandNames[i][1] == 'b':
+                greekLet = '${\\beta}$'
+            elif GBandNames[i][1] == 'c':
+                greekLet = '${\\gamma}$'
+            elif GBandNames[i][1] == 'd':
+                greekLet = '${\\delta}$'
+            GBandFancyNames[i] = "H" + greekLet + \
+                " " + "${\\lambda}$" + tempVec[-1]
         else:
             if len(tempVec[0]) == 2:
                 underscore2Add = '__'
@@ -154,5 +179,7 @@ def reformatGBandNames(GBandNames):
                 underscore2Add = ''
             GBandNames[i] = '[' + tempVec[0] + ']' + \
                 underscore2Add + tempVec[-1]
+            GBandFancyNames[i] = '[' + tempVec[0] + '] ' + \
+                '${\\lambda}$' + tempVec[-1]
 
-    return GBandNames
+    return [GBandNames, GBandFancyNames]

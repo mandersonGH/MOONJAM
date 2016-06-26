@@ -61,6 +61,7 @@ def plotD4000(filename):
         if i == 2:
             ratioMat4Plot = dC.maskInvalidFlaggedVals(ratioMat4Plot)
             cmapD = colors.ListedColormap(['red', 'blue'])
+            cmapD.set_bad('0.75')
             bounds = [0.5, 1.6, 3]
             norm = colors.BoundaryNorm(bounds, cmapD.N)
             plt.pcolormesh(x2, y2, ratioMat4Plot, cmap=cmapD, norm=norm)
@@ -83,7 +84,7 @@ def plotD4000(filename):
 
         plt.colorbar()
 
-        plt.axis([x2.min(), x2.max(), y2.min(), y2.max()])
+        plt.axis([x2.min() - 1, x2.max() + 1, y2.min() - 1, y2.max() + 1])
         plt.xlabel("arcsec")
         plt.ylabel("arcsec")
 
@@ -92,7 +93,10 @@ def plotD4000(filename):
         plt.plot([x2.min(), x2.max()], [0, 0], 'k')
         plt.plot([0, 0], [y2.min(), y2.max()], 'k')
 
-        plt.suptitle(mainTitle + '_D4000', fontsize=17)
+        # plt.suptitle("$D_n$" + "(4000)", fontsize=17)
+        plt.title("$D_n$" + "(4000)", fontsize=17)
+        plt.annotate("Plate-IFU: " + "-".join(mainTitle.split('-')[1:3]), xy=(
+            x2.min() + len(x2) * 0.01, y2.min() + len(y2) * 0.01), size=10)
 
         plt.savefig(nFP + newFileName +
                     '_D4000_' + str(i) + '.png', bbox_inches='tight', dpi=100)

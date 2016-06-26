@@ -5,8 +5,9 @@ from plotD4000 import *
 from plotBPT import *
 from plotWHAN import *
 from plotHDA import *
-from plotSFH import *
-from plotSSP import *
+# from plotSFH import *
+# from plotSSP import *
+from plotP3SSP import *
 import sys
 import direcFuncs as dF
 import time
@@ -59,11 +60,11 @@ else:
     subAns = 'Y'
     if len(sys.argv) == 2:
         opts = ['linear', 'log', 'd4000', 'gband',
-                'bpt', 'whan', 'hda', 'sfh', 'ssp']
+                'bpt', 'whan', 'hda', 'pipe3d_sfh', 'pipe3d_ssp']
     else:
         opts = [sys.argv[i].lower() for i in range(2, len(sys.argv))]
 
-while 'bpt' not in opts and 'gband' not in opts and 'whan' not in opts and 'd4000' not in opts and 'hda' not in opts and 'sfh' not in opts and 'ssp' not in opts:
+while 'bpt' not in opts and 'gband' not in opts and 'whan' not in opts and 'd4000' not in opts and 'hda' not in opts and 'pipe3d_sfh' not in opts and 'pipe3d_ssp' not in opts:
     opts = optsPrompt()
 
 start = time.time()
@@ -129,17 +130,17 @@ if 'd4000' in opts or 'hda' in opts:
             print("##########-Making HDA plots from " + file + "-##########")
             plotHDA(file)
 
-# if 'sfh' in opts:
+# if 'pipe3d_sfh' in opts:
 #     for file in dF.locate("*SFH.cube.fits", subBin, pwd) + dF.locate("*SFH.cube.fits.gz", subBin, pwd):
 #         print("")
 #         print("##########-Making SFH plots from " + file + "-##########")
 #         plotSFH(file)
 
-# if 'ssp' in opts:
-#     for file in dF.locate("*SSP.cube.fits", subBin, pwd) + dF.locate("*SSP.cube.fits.gz", subBin, pwd):
-#         print("")
-#         print("##########-Making SSP plots from " + file + "-##########")
-#         plotSSP(file)
+if 'pipe3d_ssp' in opts:
+    for file in dF.locate("*SSP.cube.fits", subBin, pwd) + dF.locate("*SSP.cube.fits.gz", subBin, pwd):
+        print("")
+        print("##########-Making SSP plots from " + file + "-##########")
+        plotP3SSP(file)
 
 end = time.time()
 print("The time elapsed is " + str(end - start) + " seconds")
