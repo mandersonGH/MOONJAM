@@ -15,7 +15,8 @@ def plotP3SSP(filename):
     fileLs = '-'.join((((filename.split('/')
                          [-1]).split('.fits')[0]).split('-'))[1:3]).split('.')[0]
 
-    fiberNo = int(filename.split(".")[0].split("-")[-1].split('0')[0])
+    # print(filename.split("/")[-1])
+    fiberNo = int(filename.split("/")[-1].split("-")[-1].split('0')[0])
 
     x2, y2 = pT.createAxis(fiberNo, temp[0].header, 'PIPE3D_SSP')
     dataCube = temp[0].data
@@ -40,11 +41,11 @@ def plotP3SSP(filename):
         sliceMat = dC.flagOutsideZeros(dataCube[i])
         sliceMat = dC.flagHighValues(sliceMat, 10000)
         sliceMat = dC.flagOutlierValues(sliceMat, 10)
-        v_max = dC.pickVMAX(sliceMat, 5)
-        v_min = dC.pickVMIN(sliceMat, 5)
+        v_max = dC.pickVMAX(sliceMat, 3)
+        v_min = dC.pickVMIN(sliceMat, 3)
         sliceMat = dC.maskInvalidFlaggedVals(sliceMat)
 
-        cmap1 = plt.cm.plasma
+        cmap1 = plt.cm.afmhot_r
         cmap1.set_bad('0.75')
 
         plt.figure()
@@ -62,5 +63,6 @@ def plotP3SSP(filename):
         plt.annotate("Plate-IFU: " + fileLs, xy=(x2.min() +
                                                  len(x2) * 0.01, y2.min() + len(y2) * 0.01), size=10)
 
-        plt.savefig(nFP + fileLs + "_" + descDict[i] + '.png', bbox_inches='tight', dpi=100)
+        plt.savefig(nFP + fileLs + "_" +
+                    descDict[i] + '.png', bbox_inches='tight', dpi=100)
     # plt.show()
