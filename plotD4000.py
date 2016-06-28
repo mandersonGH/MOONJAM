@@ -14,13 +14,11 @@ def plotD4000(filename):
     # setup new directory for figure-saving
     nFP = direcFuncs.setupNewDir(filename, 'D4000', "")
     # setup title for figure and saving
-    mainTitle = (filename.split('/')[-1]).split('.fits')[0]
-    newFileName = '-'.join(mainTitle.split('-')[1:3])
-
     # temp.info()
 
-    fiberNo = int((str(temp[0].header[55]))[
-                  :(str(temp[0].header[55])).find('0')])
+    plate_IFU, SPAXD_vec = pT.pullGeneralInfo(temp[0].header, filename)
+
+    # temp.info()
 
     # extract dataCube and wavelength vector
     dataCube = temp[1].data
@@ -46,7 +44,7 @@ def plotD4000(filename):
             ratioMat[i, j] = topMean / botMean
     ######### axis business ############
 
-    x2, y2 = pT.createAxis(fiberNo, temp[1].header, 'LOGCUBE')
+    x2, y2 = pT.createAxis(plate_IFU, temp, 1, 'LOGCUBE')
 
     ########### plotting three different figures ############
 
@@ -95,10 +93,10 @@ def plotD4000(filename):
 
         # plt.suptitle("$D_n$" + "(4000)", fontsize=17)
         plt.title("$D_n$" + "(4000)", fontsize=17)
-        plt.annotate("Plate-IFU: " + "-".join(mainTitle.split('-')[1:3]), xy=(
+        plt.annotate("Plate-IFU: " + plate_IFU, xy=(
             x2.min() + len(x2) * 0.01, y2.min() + len(y2) * 0.01), size=10)
 
-        plt.savefig(nFP + newFileName +
+        plt.savefig(nFP + plate_IFU +
                     '_D4000_' + str(i) + '.png', bbox_inches='tight', dpi=100)
 
     # plt.show()

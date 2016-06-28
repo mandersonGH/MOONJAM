@@ -20,8 +20,8 @@ def plotGband(filename, LOGinput):
 
     # open file
     temp = fits.open(filename)
-    fiberNo = int((str(temp[0].header[51]))[
-                  :(str(temp[0].header[51])).find('0')])
+
+    plate_IFU, SPAXD_vec = pT.pullGeneralInfo(temp[0].header, filename)
 
     # temp.info()
 
@@ -30,13 +30,11 @@ def plotGband(filename, LOGinput):
     iAr = [1, 11]
     # for ii in range(0, 2):
     #     i = iAr[ii]
-    # print(temp[0].name)
-    # print(temp[0].header.keys)
+    # temp.info()
+    # print(temp[1].header.keys)
 
     # setup new directory for figure-saving
     nFP = direcFuncs.setupNewDir(filename, 'GBand', typeStr)
-    fileLs = '-'.join((((filename.split('/')
-                         [-1]).split('.fits')[0]).split('-'))[1:3])
 
     # correct GBand names to include bracket for forbidden transitions
     GBandNames = []
@@ -53,7 +51,7 @@ def plotGband(filename, LOGinput):
         # print(temp[i].name.split("_")[-1] +
         #       ": " + temp[i].header[31 + j])
 
-        newFileName = fileLs + '_' + GBandNames[j] + typeStr
+        newFileName = plate_IFU + '_' + GBandNames[j] + typeStr
 
         plt.figure(figsize=(15.5, 5.5))
 
@@ -114,7 +112,7 @@ def plotGband(filename, LOGinput):
             plt.xlabel("arcsec")
             plt.ylabel("arcsec")
 
-            x2, y2 = pT.createAxis(fiberNo, temp[i].header, 'default')
+            x2, y2 = pT.createAxis(plate_IFU, temp, i, 'default')
 
             plt.axis([x2.min() - 1, x2.max() + 1, y2.min() - 1, y2.max() + 1])
 
@@ -142,7 +140,7 @@ def plotGband(filename, LOGinput):
             plt.plot([0, 0], [y2.min(), y2.max()], 'k')
 
             ########### plateIFU annotiation ##############
-            plt.annotate("Plate-IFU: " + fileLs, xy=(x2.min() +
+            plt.annotate("Plate-IFU: " + plate_IFU, xy=(x2.min() +
                                                      len(x2) * 0.01, y2.min() + len(y2) * 0.01), size=10)
 
             ########## saving plot to new folder #############

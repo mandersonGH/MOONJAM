@@ -19,19 +19,14 @@ def plotWHAN(filename):
 
     nFP = dF.setupNewDir(filename, "", 'WHAN')
 
-    # for splitting the filename
-    name = (filename.split('/')[-1]).split('.')[0]
-    name_plateNum_Bundle = '-'.join(name.split('-')[1:3])
-
-    axis1_n = temp[1].header[3]
-    axis2_n = temp[1].header[4]
-    refPnt = [temp[1].header[9], temp[1].header[10]]
-    SPAXD_vec = [temp[0].header[72], temp[0].header[73]]
-
-    dMat = pT.createDistanceMatrix([axis1_n, axis2_n], refPnt, SPAXD_vec)
+    plate_IFU, SPAXD_vec = pT.pullGeneralInfo(temp[0].header, filename)
 
     # Taking data from GFlux
     headerInd = 1
+
+    NAXIS_vec, refPnt = pT.pullSpecificInfo(temp, headerInd)
+
+    dMat = pT.createDistanceMatrix(NAXIS_vec, refPnt, SPAXD_vec)
 
     # extract NII and make into 1D array
     NII = temp[headerInd].data[6]
@@ -83,8 +78,8 @@ def plotWHAN(filename):
     plt.annotate('SF', xy=((-0.4 + xmin) / 2, (0.5 + ymax) * 0.75))
     plt.annotate('AGN', xy=((-0.4 + xmax) / 2, (0.5 + ymax) * 0.75))
     plt.annotate('Old Stars', xy=((xmin + xmax) * 0.5, (ymin + 0.5) * 0.25))
-    plt.annotate("Plate-IFU: " + name_plateNum_Bundle, xy=(xmin +
+    plt.annotate("Plate-IFU: " + plate_IFU, xy=(xmin +
                                                            (xmax - xmin) * 0.02, ymin + (ymax - ymin) * 0.02), size=10)
-    plt.savefig(nFP + name_plateNum_Bundle + '_WHAN.png', bbox_inches='tight')
+    plt.savefig(nFP + plate_IFU + '_WHAN.png', bbox_inches='tight')
     # plt.show()
     plt.close()

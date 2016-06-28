@@ -7,7 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from astropy.io import fits
 from matplotlib import rc
-import direcFuncs
+import direcFuncs as dF
 import plottingTools as pT
 
 
@@ -15,21 +15,17 @@ def plotBPT(filename):
 
     temp = fits.open(filename)
 
-    nFP = direcFuncs.setupNewDir(filename, "BPT", "")
+    nFP = dF.setupNewDir(filename, "BPT", "")
 
     # for splitting the filename
-    name = (filename.split('/')[-1]).split('.')[0]
-    name_plateNum_Bundle = '-'.join(name.split('-')[1:3])
+    plate_IFU, SPAXD_vec = pT.pullGeneralInfo(temp[0].header, filename)
 
     # Taking data from GFlux
     headerInd = 1
 
-    axis1_n = temp[1].header[3]
-    axis2_n = temp[1].header[4]
-    refPnt = [temp[1].header[9], temp[1].header[10]]
-    SPAXD_vec = [temp[0].header[72], temp[0].header[73]]
+    NAXIS_vec, refPnt = pT.pullSpecificInfo(temp, headerInd)
 
-    dMat = pT.createDistanceMatrix([axis1_n, axis2_n], refPnt, SPAXD_vec)
+    dMat = pT.createDistanceMatrix(NAXIS_vec, refPnt, SPAXD_vec)
 
     # extract OIII and make into 1D array
     OIII = temp[headerInd].data[3]
@@ -94,12 +90,12 @@ def plotBPT(filename):
                            ymin / 2), size='18', color='m')
     plt.annotate('Inter', xy=((x1[x1_at_yHalf] + x2[x2_at_yHalf])
                               * 0.5, ymin / 2), size='12', color='g')
-    plt.annotate("Plate-IFU: " + name_plateNum_Bundle, xy=(xmin +
-                                                           (xmax - xmin) * 0.015, ymin + (ymax - ymin) * 0.015), size=10)
+    plt.annotate("Plate-IFU: " + plate_IFU, xy=(xmin + (xmax - xmin)
+                                                * 0.015, ymin + (ymax - ymin) * 0.015), size=10)
     plt.plot(x1, y1, 'k')
     plt.plot(x2, y2, '--k')
     plt.xlim([xmin, xmax])
     plt.ylim([ymin, ymax])
-    plt.savefig(nFP + name_plateNum_Bundle + '_BPT.png', bbox_inches='tight')
+    plt.savefig(nFP + plate_IFU + '_BPT.png', bbox_inches='tight')
     # plt.show()
     plt.close()
