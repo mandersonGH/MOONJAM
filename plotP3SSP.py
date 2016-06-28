@@ -12,13 +12,9 @@ import string
 def plotP3SSP(filename):
     temp = fits.open(filename)
     nFP = dF.setupNewDir(filename, 'PIPE3D_SSP', "")
-    fileLs = '-'.join((((filename.split('/')
-                         [-1]).split('.fits')[0]).split('-'))[1:3]).split('.')[0]
+    plate_IFU, SPAXD_vec = pT.pullGeneralInfo(temp[0].header, filename)
 
-    # print(filename.split("/")[-1])
-    fiberNo = int(filename.split("/")[-1].split("-")[-1].split('0')[0])
-
-    x2, y2 = pT.createAxis(fiberNo, temp[0].header, 'PIPE3D_SSP')
+    x2, y2 = pT.createAxis(plate_IFU, temp, 0, 'PIPE3D_SSP')
     dataCube = temp[0].data
 
     typeDict = {}
@@ -60,9 +56,9 @@ def plotP3SSP(filename):
         # plt.plot([0, 0], [y2.min(), y2.max()], 'k')
 
         ########### plateIFU annotiation ##############
-        plt.annotate("Plate-IFU: " + fileLs, xy=(x2.min() +
+        plt.annotate("Plate-IFU: " + plate_IFU, xy=(x2.min() +
                                                  len(x2) * 0.01, y2.min() + len(y2) * 0.01), size=10)
 
-        plt.savefig(nFP + fileLs + "_" +
+        plt.savefig(nFP + plate_IFU + "_" +
                     descDict[i] + '.png', bbox_inches='tight', dpi=100)
     # plt.show()

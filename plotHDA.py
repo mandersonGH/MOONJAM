@@ -14,17 +14,13 @@ def plotHDA(filename):
     # setup new directory for figure-saving
     nFP = direcFuncs.setupNewDir(filename, 'HDA', "")
     # setup title for figure and saving
-    mainTitle = (filename.split('/')[-1]).split('.fits')[0]
-    newFileName = '-'.join(mainTitle.split('-')[1:3])
+    plate_IFU, SPAXD_vec = pT.pullGeneralInfo(temp[0].header, filename)
 
     # temp.info()
     # for j in [0, 1]:
     #     print("")
     #     for i in range(0, len(temp[j].header.keys())):
-    #         print(str(temp[j].header.keys()[i]) + " -- " + str(temp[j].header[i]))
-
-    fiberNo = int((str(temp[0].header[55]))[
-                  :(str(temp[0].header[55])).find('0')])
+    # print(str(temp[j].header.keys()[i]) + " -- " + str(temp[j].header[i]))
 
     # extract dataCube and wavelength vector
     dataCube = temp[1].data
@@ -52,7 +48,7 @@ def plotHDA(filename):
 
     ######### axis business ############
 
-    x2, y2 = pT.createAxis(fiberNo, temp[1].header, 'LOGCUBE')
+    x2, y2 = pT.createAxis(plate_IFU, temp, 1, 'LOGCUBE')
 
     ########### plotting three different figures ############
 
@@ -82,11 +78,11 @@ def plotHDA(filename):
     # axes.set_title("H${\\delta}_A$", fontsize=17)
     plt.title("H${\\delta}_A$", fontsize=17)
 
-    plt.annotate("Plate-IFU: " + "-".join(mainTitle.split('-')
-                                          [1:3]), xy=(x2.min() + len(x2) * 0.01, y2.min() + len(y2) * 0.01), size=10)
+    plt.annotate("Plate-IFU: " + plate_IFU, xy=(x2.min() + len(x2)
+                                                * 0.01, y2.min() + len(y2) * 0.01), size=10)
 
-    plt.savefig(nFP + newFileName +
-                '_HDA_' + '.png', bbox_inches='tight', dpi=100)
+    plt.savefig(nFP + plate_IFU + '_HDA' + '.png',
+                bbox_inches='tight', dpi=100)
 
     # plt.show()
     plt.close('all')
