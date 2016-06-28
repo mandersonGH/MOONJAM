@@ -1,7 +1,3 @@
-# extract data from fits file
-# read file
-# type $ ipython {this file path} {.fits or .gz file path}
-
 from astropy.io import fits
 import numpy as np
 import matplotlib as mpl
@@ -19,9 +15,9 @@ def plotGband(filename, LOGinput):
         typeStr = '_LOG'
 
     # open file
-    temp = fits.open(filename)
+    hdu = fits.open(filename)
 
-    plate_IFU, SPAXD_vec = pT.pullGeneralInfo(temp[0].header, filename)
+    plate_IFU, SPAXD_vec = pT.pullGeneralInfo(hdu[0].header, filename)
 
     # temp.info()
 
@@ -39,7 +35,7 @@ def plotGband(filename, LOGinput):
     # correct GBand names to include bracket for forbidden transitions
     GBandNames = []
     for j in range(0, 11):
-        GBandNames.append(temp[iAr[1]].header[31 + j])
+        GBandNames.append(hdu[iAr[1]].header[31 + j])
     tempVec = reformatGBandNames(GBandNames)
     GBandNames = tempVec[0]
     GBandFancyNames = tempVec[1]
@@ -59,7 +55,7 @@ def plotGband(filename, LOGinput):
             i = iAr[ii]
 
             # pick out data slice
-            sliceMat = temp[i].data[j]
+            sliceMat = hdu[i].data[j]
 
             ############ data Correction #############
 
@@ -102,17 +98,17 @@ def plotGband(filename, LOGinput):
 
             if LOGinput == 0:
                 axes.set_title(GBandFancyNames[
-                               j] + " " + temp[i].name.split("_")[1], fontsize=12)
+                               j] + " " + hdu[i].name.split("_")[1], fontsize=12)
             elif LOGinput == 1:
                 axes.set_title(
-                    "log (" + GBandFancyNames[j] + " " + temp[i].name.split("_")[1] + ")", fontsize=12)
+                    "log (" + GBandFancyNames[j] + " " + hdu[i].name.split("_")[1] + ")", fontsize=12)
 
             ######### axis business ############
 
             plt.xlabel("arcsec")
             plt.ylabel("arcsec")
 
-            x2, y2 = pT.createAxis(plate_IFU, temp, i, 'default')
+            x2, y2 = pT.createAxis(plate_IFU, hdu, i, 'default')
 
             plt.axis([x2.min() - 1, x2.max() + 1, y2.min() - 1, y2.max() + 1])
 
@@ -132,7 +128,7 @@ def plotGband(filename, LOGinput):
             # plt.pcolormesh(x2, y2, sliceMat, cmap=cmap1, vmin=vmin, vmax=vmax)
 
             cbar = plt.colorbar()
-            cbar.set_label(temp[i].header[42])
+            cbar.set_label(hdu[i].header[42])
 
             ############ cross hairs lines ###############
 

@@ -9,20 +9,20 @@ import plottingTools as pT
 
 def plotD4000(filename):
     # open file
-    temp = fits.open(filename)
+    hdu = fits.open(filename)
 
     # setup new directory for figure-saving
     nFP = direcFuncs.setupNewDir(filename, 'D4000', "")
     # setup title for figure and saving
     # temp.info()
 
-    plate_IFU, SPAXD_vec = pT.pullGeneralInfo(temp[0].header, filename)
+    plate_IFU, SPAXD_vec = pT.pullGeneralInfo(hdu[0].header, filename)
 
     # temp.info()
 
     # extract dataCube and wavelength vector
-    dataCube = temp[1].data
-    waveVec = temp[4].data
+    dataCube = hdu[1].data
+    waveVec = hdu[4].data
 
     # from (~70, ~4000, ~70) to (~70, ~70, ~4000)
     dataCube = np.rollaxis(dataCube, 0, 3)
@@ -44,7 +44,7 @@ def plotD4000(filename):
             ratioMat[i, j] = topMean / botMean
     ######### axis business ############
 
-    x2, y2 = pT.createAxis(plate_IFU, temp, 1, 'LOGCUBE')
+    x2, y2 = pT.createAxis(plate_IFU, hdu, 1, 'LOGCUBE')
 
     ########### plotting three different figures ############
 

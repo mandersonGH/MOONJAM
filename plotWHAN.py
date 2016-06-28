@@ -12,35 +12,35 @@ import plottingTools as pT
 
 def plotWHAN(filename):
 
-    temp = fits.open(filename)
+    hdu = fits.open(filename)
     # temp.info()
     # for i in range(0, 10):
     #     print(temp[i].header.keys)
 
     nFP = dF.setupNewDir(filename, "", 'WHAN')
 
-    plate_IFU, SPAXD_vec = pT.pullGeneralInfo(temp[0].header, filename)
+    plate_IFU, SPAXD_vec = pT.pullGeneralInfo(hdu[0].header, filename)
 
     # Taking data from GFlux
     headerInd = 1
 
-    NAXIS_vec, refPnt = pT.pullSpecificInfo(temp, headerInd)
+    NAXIS_vec, refPnt = pT.pullSpecificInfo(hdu, headerInd)
 
     dMat = pT.createDistanceMatrix(NAXIS_vec, refPnt, SPAXD_vec)
 
     # extract NII and make into 1D array
-    NII = temp[headerInd].data[6]
+    NII = hdu[headerInd].data[6]
     NII1D = NII.reshape(1, NII.size)
 
     # extract Ha and make into a 1D array
-    Ha = temp[headerInd].data[7]
+    Ha = hdu[headerInd].data[7]
     Ha1D = Ha.reshape(1, Ha.size)
 
     # Taking data from EW
     headerInd = 11
 
     # extract EW(Ha) and make into a 1D array
-    EWHa = temp[headerInd].data[7]
+    EWHa = hdu[headerInd].data[7]
     EWHa1D = EWHa.reshape(1, EWHa.size)
 
     # plot

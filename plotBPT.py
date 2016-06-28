@@ -13,34 +13,34 @@ import plottingTools as pT
 
 def plotBPT(filename):
 
-    temp = fits.open(filename)
+    hdu = fits.open(filename)
 
     nFP = dF.setupNewDir(filename, "BPT", "")
 
     # for splitting the filename
-    plate_IFU, SPAXD_vec = pT.pullGeneralInfo(temp[0].header, filename)
+    plate_IFU, SPAXD_vec = pT.pullGeneralInfo(hdu[0].header, filename)
 
     # Taking data from GFlux
     headerInd = 1
 
-    NAXIS_vec, refPnt = pT.pullSpecificInfo(temp, headerInd)
+    NAXIS_vec, refPnt = pT.pullSpecificInfo(hdu, headerInd)
 
     dMat = pT.createDistanceMatrix(NAXIS_vec, refPnt, SPAXD_vec)
 
     # extract OIII and make into 1D array
-    OIII = temp[headerInd].data[3]
+    OIII = hdu[headerInd].data[3]
     OIII1D = OIII.reshape(1, OIII.size)
 
     # extract Hb and make into 1D array
-    Hb = temp[headerInd].data[1]
+    Hb = hdu[headerInd].data[1]
     Hb1D = Hb.reshape(1, Hb.size)
 
     # extract NII and make into 1D array
-    NII = temp[headerInd].data[6]
+    NII = hdu[headerInd].data[6]
     NII1D = NII.reshape(1, NII.size)
 
     # extract Ha and make into a 1D array
-    Ha = temp[headerInd].data[7]
+    Ha = hdu[headerInd].data[7]
     Ha1D = Ha.reshape(1, Ha.size)
 
     # plot

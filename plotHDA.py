@@ -9,12 +9,12 @@ import plottingTools as pT
 
 def plotHDA(filename):
     # open file
-    temp = fits.open(filename)
+    hdu = fits.open(filename)
 
     # setup new directory for figure-saving
     nFP = direcFuncs.setupNewDir(filename, 'HDA', "")
     # setup title for figure and saving
-    plate_IFU, SPAXD_vec = pT.pullGeneralInfo(temp[0].header, filename)
+    plate_IFU, SPAXD_vec = pT.pullGeneralInfo(hdu[0].header, filename)
 
     # temp.info()
     # for j in [0, 1]:
@@ -23,8 +23,8 @@ def plotHDA(filename):
     # print(str(temp[j].header.keys()[i]) + " -- " + str(temp[j].header[i]))
 
     # extract dataCube and wavelength vector
-    dataCube = temp[1].data
-    waveVec = temp[4].data
+    dataCube = hdu[1].data
+    waveVec = hdu[4].data
 
     # from (~70, ~4000, ~70) to (~70, ~70, ~4000)
     # dataCube = np.rollaxis(dataCube, 0, 3)
@@ -48,7 +48,7 @@ def plotHDA(filename):
 
     ######### axis business ############
 
-    x2, y2 = pT.createAxis(plate_IFU, temp, 1, 'LOGCUBE')
+    x2, y2 = pT.createAxis(plate_IFU, hdu, 1, 'LOGCUBE')
 
     ########### plotting three different figures ############
 
@@ -61,7 +61,7 @@ def plotHDA(filename):
     plt.pcolormesh(x2, y2, sliceMat, cmap=cmapD)
 
     cbar = plt.colorbar()
-    cbar.set_label(temp[1].header[19])
+    cbar.set_label(hdu[1].header[19])
 
     plt.axis([x2.min() - 1, x2.max() + 1, y2.min() - 1, y2.max() + 1])
     plt.xlabel("arcsec")

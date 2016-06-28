@@ -10,9 +10,9 @@ import string
 
 
 def plotP3SSP(filename):
-    temp = fits.open(filename)
+    hdu = fits.open(filename)
     nFP = dF.setupNewDir(filename, 'PIPE3D_SSP', "")
-    plate_IFU, SPAXD_vec = pT.pullGeneralInfo(temp[0].header, filename)
+    plate_IFU, SPAXD_vec = pT.pullGeneralInfo(hdu[0].header, filename)
 
     x2, y2 = pT.createAxis(plate_IFU, temp, 0, 'PIPE3D_SSP')
     dataCube = temp[0].data
@@ -21,16 +21,16 @@ def plotP3SSP(filename):
     unitDict = {}
     descDict = {}
     fileDict = {}
-    for j in range(0, len(temp[0].header.keys())):
-        tempStr = temp[0].header.keys()[j].split("_")
+    for j in range(0, len(hdu[0].header.keys())):
+        tempStr = hdu[0].header.keys()[j].split("_")
         if tempStr[0] == "TYPE":
-            typeDict[int(tempStr[1])] = temp[0].header[j]
+            typeDict[int(tempStr[1])] = hdu[0].header[j]
         elif tempStr[0] == "DESC":
-            descDict[int(tempStr[1])] = string.capwords(temp[0].header[j])
+            descDict[int(tempStr[1])] = string.capwords(hdu[0].header[j])
         elif tempStr[0] == "UNITS":
-            unitDict[int(tempStr[1])] = temp[0].header[j]
+            unitDict[int(tempStr[1])] = hdu[0].header[j]
         elif tempStr[0] == "FILE":
-            fileDict[int(tempStr[1])] = temp[0].header[j]
+            fileDict[int(tempStr[1])] = hdu[0].header[j]
 
     for i in range(0, dataCube.shape[0]):
 
