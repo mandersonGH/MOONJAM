@@ -3,19 +3,22 @@ import os
 import fnmatch
 
 
-def setupNewDir(filename, newFolderName, typeStr):
-    # ensures new folder
-    # sets up folder path for new files
-    fileLs = filename.split('/')
-    # newFldrNme = fileLs[-1]
-    del fileLs[-1]
+def getEADirAndFilename(file):
+    fileVec = file.split("\\")
+    filename = fileVec[-1]
 
-    newFldrPath = '/'.join(fileLs) + '/Figures/' + \
-        newFolderName + typeStr + '/'
-    assure_path_exists(newFldrPath)
+    ind = fileVec.index('9 Poster Galaxies')
 
-    return newFldrPath
+    del fileVec[ind + 1:]
+    EADir = '\\'.join(fileVec)
 
+    return EADir, filename
+
+def getFilename(file):
+    fileVec = file.split("\\")
+    filename = fileVec[-1]
+
+    return filename
 
 def assure_path_exists(path):
     # from
@@ -25,10 +28,14 @@ def assure_path_exists(path):
         os.makedirs(dir)
         print("New directory made {" + dir + "/}")
 
+    return(path)
 
-def locate(pattern, subBin, rootD=os.curdir):
+
+def locate(endOfFilename, subBin, rootD=os.curdir):
+    pattern = '*' + endOfFilename
     matches = []
     if subBin is True:
+#         print(rootD)
         for root, dirnames, filenames in os.walk(rootD):
             for filename in fnmatch.filter(filenames, pattern):
                 matches.append(os.path.join(root, filename))

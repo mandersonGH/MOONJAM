@@ -52,17 +52,23 @@ def checkFreqHisto(dataIn, title):
 
 
 def pickVMIN(dataIn, devs):
-    if np.nanmean(dataIn) - devs * np.nanstd(dataIn) < np.nanmin(dataIn):
-        return np.nanmin(dataIn)
-    else:
-        return np.nanmean(dataIn) - devs * np.nanstd(dataIn)
+    try:
+        if np.nanmean(dataIn) - devs * np.nanstd(dataIn) < np.nanmin(dataIn):
+            return np.nanmin(dataIn)
+        else:
+            return np.nanmean(dataIn) - devs * np.nanstd(dataIn)
+    except ValueError:
+        return 1
 
 
 def pickVMAX(dataIn, devs):
-    if np.nanmean(dataIn) + devs * np.nanstd(dataIn) > np.nanmax(dataIn):
-        return np.nanmax(dataIn)
-    else:
-        return np.nanmean(dataIn) + devs * np.nanstd(dataIn)
+    try:
+        if np.nanmean(dataIn) + devs * np.nanstd(dataIn) > np.nanmax(dataIn):
+            return np.nanmax(dataIn)
+        else:
+            return np.nanmean(dataIn) + devs * np.nanstd(dataIn)
+    except ValueError:
+        return 1
 
 
 def printDataInfo(dataIn):
