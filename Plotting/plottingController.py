@@ -42,9 +42,9 @@ class plottingController(object):
             if plotType in self.dictPIPE3Dfiles.keys():
                 plotters.append(plotter_PIPE3D())
             if 'mpl4' in self.myOpts and plotType in self.dictMPL4files.keys():
-                plotters.append(plotter_DAP('mpl-4'))
+                plotters.append(plotter_DAP('MPL-4'))
             if 'mpl5' in self.myOpts and plotType in self.dictMPL5files.keys():
-                plotters.append(plotter_DAP('mpl-5'))
+                plotters.append(plotter_DAP('MPL-5'))
             self.runPlotters(plotters, plotType)
             
     def runPlotters(self, plotters, plotType):

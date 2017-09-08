@@ -1,16 +1,21 @@
+'''
+Created on Sep 8, 2017
+
+@author: Mande
+'''
+
 import numpy as np
 
 import matplotlib.pyplot as plt
 
 import helperFuncs as hF
 import direcFuncs as dF
-import fitsExtraction as fE
+import GalaxyObject.fitsExtraction as fE
 import plottingTools as pT
 from plotFuncs import CAS_spectra
 
-
-def plotReSpectra(EADir, DAPtype, filepath, hdu, plotType, plate_IFU, Re, center, dataInd, dataCube, waveVec):
-    nFP = dF.assure_path_exists(EADir + DAPtype + '/PLOTS/DAP/'+ plate_IFU +'/ReSpectra/')
+def plotReSpectra(EADir, galaxy, DAPtype, plotType, dataInd, dataCube, waveVec):
+    nFP = dF.assure_path_exists(EADir + DAPtype + '/PLOTS/DAP/'+ galaxy.PLATEIFU +'/ReSpectra/')
     # unitsY = hdu[0].header['BUNIT']
     unitsX = 'Wavelength (Angstroms)'
     # unitsY = '$' + unitsY + '$'
@@ -18,7 +23,7 @@ def plotReSpectra(EADir, DAPtype, filepath, hdu, plotType, plate_IFU, Re, center
 
     unitsY = '$f_{\\lambda}$ ' + ' (' + '$10^{-17}$' + 'erg/s/cm' + '$^{2}$' + '/Ang)'
 
-    hex_at_Cen, gal_at_Cen = fE.getCenters(hdu, plate_IFU, dataInd)
+    hex_at_Cen, gal_at_Cen = fE.getCenters(galaxy.myHDU, galaxy.PLATEIFU, dataInd)
 
     refPnt = [hex_at_Cen[1], hex_at_Cen[0]]
 
@@ -27,13 +32,13 @@ def plotReSpectra(EADir, DAPtype, filepath, hdu, plotType, plate_IFU, Re, center
 
     # ReSpectra, dictRadiiSpaxNum = createRadialSpectra(waveVec, dataCube, radii, refPnt, Re)
     NormalizedReSpectra, dictRadiiSpaxNum = createRadialSpectra(
-        waveVec, dataCube, radii, refPnt, Re, normWavelength=5500)
+        waveVec, dataCube, radii, refPnt, galaxy.Re, normWavelength=5500)
 
     # ReSpectra, dictWedgeSpaxNum = createWedgeSpectra(dataCube, radii, refPnt, Re, hdu, plate_IFU, dataInd, center)
 
     # plotSideBySideSpectra(plate_IFU, radii, waveVec, ReSpectra, dictRadiiSpaxNum, unitsX, unitsY, EADir, nFP, '123')
     # plotStackedSpectra(plate_IFU, radii, waveVec, ReSpectra, dictRadiiSpaxNum, unitsX, unitsY, EADir, nFP)
-    plotStackedSpectra(plate_IFU, radii, waveVec, NormalizedReSpectra, dictRadiiSpaxNum,
+    plotStackedSpectra(galaxy.PLATEIFU, radii, waveVec, NormalizedReSpectra, dictRadiiSpaxNum,
                        unitsX, unitsY, EADir, nFP, extraLabel='Normed')
 
 

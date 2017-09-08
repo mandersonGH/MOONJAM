@@ -19,7 +19,7 @@ fontsize = 30
 
 def plotQuadPlot(EADir, galaxy, nFP, dataInd, dataMat, errMat, maskMat, units, newFileName, plotTitle, vmax=None, vmin=None):
     # print(center)
-    simple = 'Yes'
+    simple = 'No'
     hex_at_Cen, gal_at_Cen = fE.getCenters(galaxy.myHDU, galaxy.PLATEIFU, dataInd)
 
     # print("Masking " + str(round(float(sum(sum(maskMat)) * 100) /
@@ -41,16 +41,16 @@ def plotQuadPlot(EADir, galaxy, nFP, dataInd, dataMat, errMat, maskMat, units, n
                           dataMat, maskMat, hex_at_Cen, gal_at_Cen, vmax, vmin, axes2)
 
     if simple == 'No':
-      dOP.addCrossHairs(axes2, galaxy.PLATEIFU, galaxy.Re, hex_at_Cen)
-      dOP.addReCircles(axes2)
+        dOP.addCrossHairs(axes2, galaxy.PLATEIFU, galaxy.Re, hex_at_Cen)
+        dOP.addReCircles(axes2)
 
-      axes3 = plt.subplot(2, 2, 3)
-      plotMajMinAxis(galaxy.PLATEIFU, galaxy.Re, galaxy.myCenterType, dataMat, errMat, maskMat, 
+        axes3 = plt.subplot(2, 2, 3)
+        plotMajMinAxis(galaxy.PLATEIFU, galaxy.Re, galaxy.myCenterType, dataMat, errMat, maskMat, 
                      units, hex_at_Cen, gal_at_Cen, axes3, 'major')
 
 
-      axes4 = plt.subplot(2, 2, 4)
-      plotMajMinAxis(galaxy.PLATEIFU, galaxy.Re, galaxy.myCenterType, dataMat, errMat, maskMat, 
+        axes4 = plt.subplot(2, 2, 4)
+        plotMajMinAxis(galaxy.PLATEIFU, galaxy.Re, galaxy.myCenterType, dataMat, errMat, maskMat, 
                      units, hex_at_Cen, gal_at_Cen, axes4, 'minor')
 
     # fig.tight_layout()
@@ -218,10 +218,9 @@ def opticalImage(EADir, hdu, plate_IFU, Re, center, dataInd, axes):
 
 
 def plotMajMinAxis(plate_IFU, Re, center, dataMat, errMat, maskMat, units, hex_at_Cen, gal_at_Cen, axes, axisType):
-
     distances, indexes = pT.major_minor_axis(
         plate_IFU, axisType, hex_at_Cen, gal_at_Cen, center=center)
-
+    print(distances)
     ReMax = 3.6
 
     axes.set_title('Along ' + axisType.title() + ' Axis', fontsize=fontsize, fontweight='bold', y=1.01)
@@ -249,6 +248,7 @@ def plotMajMinAxis(plate_IFU, Re, center, dataMat, errMat, maskMat, units, hex_a
     distances = distances[lowInd:highInd]
 
     dataAxis = np.ma.masked_invalid(dataAxis[lowInd:highInd])
+    
     plt.plot(distances / Re, dataAxis)
     axes.errorbar(distances / Re,
                   dataAxis, yerr=errAxis[lowInd:highInd])

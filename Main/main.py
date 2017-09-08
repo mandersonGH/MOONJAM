@@ -9,7 +9,7 @@ Created on Sep 8, 2017
 
 def main():
     #controller = Controller(sys.argv)
-    inputs = ['', r'C:\Users\Mande\Cloud Storage\Google Drive\2016 MOONJAM PROJECT\E + A Directory' + "\\",'mpl4','emlines_gflux']
+    inputs = ['', r'C:\Users\Mande\Desktop\E + A Directory' + "\\",'mpl4','emlines_gflux']
     controller = Controller(inputs)
     controller.run()
     

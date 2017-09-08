@@ -11,8 +11,6 @@ from Plotting.DAP.plotRatioPlots import plotRatioPlots
 
 def defaultCubePlots(EADir, galaxy , plotType, DAPtype):
     
-    print("here")
-    
     if '_' in plotType:
         plotType = plotType[plotType.index('_') + 1:]
 
