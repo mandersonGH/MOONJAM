@@ -39,6 +39,11 @@ class Galaxy():
         
     def setCenterType(self, centerType):
         self.myCenterType = centerType
+        
+    def extractDataCubes(self, dataInd, errInd, maskInd):
+        self.myDataCube = self.myHDU[dataInd].data
+        self.myErrorCube = self.myHDU[errInd].data
+        self.myMaskCube = self.myHDU[maskInd].data
      
     def close(self):
         self.myHDU.close()

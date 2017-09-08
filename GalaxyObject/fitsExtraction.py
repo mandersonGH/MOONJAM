@@ -2,7 +2,7 @@ import numpy as np
 
 from astropy.io import fits
 
-from EA_data import *
+from resources.EA_data import *
 
 
 def getNAXIS(hdu, dataInd):

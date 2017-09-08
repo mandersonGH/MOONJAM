@@ -11,19 +11,10 @@ from Plotting.DAP.plotRatioPlots import plotRatioPlots
 
 def defaultCubePlots(EADir, galaxy , plotType, DAPtype):
     
-    if '_' in plotType:
-        plotType = plotType[plotType.index('_') + 1:]
-
-    plotType = plotType.upper()
-    if DAPtype == 'MPL-5' and plotType == 'EW':
-        plotType = 'SEW'
+    plotType = formatPlotType(plotType, DAPtype)
     emLineInd, emLineFancy = initializeEmLineDict(galaxy.myHDU, plotType)
-
-    ratioPlots = ['WHAN', 'BPT']
-    if DAPtype == 'MPL-4':
-        typesOfBPT = ['']
-    elif DAPtype == 'MPL-5':
-        typesOfBPT = ['[NII]', '[SII]']
+    ratioPlots = eval(open("../resources/typesOfRatioPlots.txt").read())
+    typesOfBPT = extractTypesOfBPT(DAPtype)
 
     if plotType in ratioPlots:
         nFP = dF.assure_path_exists(EADir + '/' + DAPtype + '/PLOTS/DAP/' + galaxy.PLATEIFU + '/Ratio Plots/')
@@ -33,24 +24,39 @@ def defaultCubePlots(EADir, galaxy , plotType, DAPtype):
         else:
             plotRatioPlots(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP)
     else:
+        # non ratio plot
         nFP = dF.assure_path_exists(EADir + '/' + DAPtype + '/PLOTS/DAP/' + galaxy.PLATEIFU + '/' + plotType + '/')
-
-
-        dataInd, errInd, maskInd = getHduIndices(galaxy.myHDU, plotType)
-
-        dataCube = galaxy.myHDU[dataInd].data
-        if plotType == 'GFLUX':
-            errCube = np.sqrt(np.divide(1, (galaxy.myHDU[errInd].data * 64)))
-        else:
-            errCube = np.sqrt(np.divide(1, galaxy.myHDU[errInd].data))
-        maskCube = galaxy.myHDU[maskInd].data
-
-        plotEmLines(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP, dataInd, dataCube, errCube, maskCube)
+        dataInd, errInd, maskInd = getHduIndices(plotType)
+        galaxy.extractDataCubes(dataInd, errInd, maskInd)
+        correctErrorCube(galaxy, plotType)
+        plotEmLines(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP, dataInd)
         
-    
+def formatPlotType(plotType, DAPtype):
+    if 'EMLINES_' in plotType:
+        plotType = plotType[plotType.index('_') + 1:]
+    plotType = plotType.upper()
+    if DAPtype == 'MPL-5' and plotType == 'EW':
+        plotType = 'SEW'
+    return plotType
 
 
-def getHduIndices(hdu, plotType):
+def extractTypesOfBPT(DAPtype):
+    if DAPtype == 'MPL-4':
+        typesOfBPT = ['']
+    elif DAPtype == 'MPL-5':
+        typesOfBPT = ['[NII]', '[SII]']
+    return typesOfBPT
+
+
+def correctErrorCube(galaxy, plotType):
+    adjustmentScale = 1
+    if plotType == 'GFLUX':
+        adjustmentScale = 64
+    galaxy.myErrorCube = np.sqrt(np.divide(1, (galaxy.myErrorCube * adjustmentScale)))
+ 
+
+
+def getHduIndices(plotType):
     # if plotType == 'GFLUX':
     #     dataInd = 1
     #     errInd = 2

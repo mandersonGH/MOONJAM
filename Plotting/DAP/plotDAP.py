@@ -11,7 +11,7 @@ from Plotting.DAP.LOGCUBE_Plots import LOGCUBE_Plots
 
 class plotter_DAP(PlotterABC):
     
-    potentialDefaultCubePlots = ['emlines_gflux', 'emlines_ew', 'whan', 'bpt']
+    potentialDefaultCubePlots = eval(open("../resources/potentialDefaultCubePlots.txt").read())
 
 
     def __init__(self, mplNum):

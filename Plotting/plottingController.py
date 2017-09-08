@@ -8,26 +8,9 @@ from Plotting.PIPE3D.plotPIPE3D import plotter_PIPE3D
 
 class plottingController(object):
     
-    dictPIPE3Dfiles = {'sfh': 'p_e.rad_SFH_lum_Mass.fits',
-                       '_____': 'p_e.Sigma_Mass.fits',
-                       'requested': '.cube.fits',
-                       'lum_fracs': 'SFH.cube.fits',
-                       'stellpops': 'SSP.cube.fits',
-                       'flux_elines': '.cube.fits',
-                       'indices.cs': '.cube.fits',
-                       'elines': 'ELINES.cube.fits'}
-
-    dictMPL4files = {'bpt': 'default.fits',
-                     'whan': 'default.fits',
-                     'emlines_gflux': 'default.fits',
-                     'emlines_ew': 'default.fits',
-                     'respectra': 'LOGCUBE.fits'}
-    
-    dictMPL5files = {'bpt': 'MAPS-SPX-GAU-MILESHC.fits',
-                     'whan': 'MAPS-SPX-GAU-MILESHC.fits',
-                     'emlines_gflux': 'MAPS-SPX-GAU-MILESHC.fits',
-                     'emlines_ew': 'MAPS-SPX-GAU-MILESHC.fits',
-                     'respectra': 'LOGCUBE-SPX-GAU-MILESHC.fits'}
+    dictMPL4files = eval(open("../resources/dictMPL4files.txt").read())
+    dictMPL5files = eval(open("../resources/dictMPL5files.txt").read())
+    dictPIPE3Dfiles = eval(open("../resources/dictPIPE3Dfiles.txt").read())
 
 
     def __init__(self, EADirectory, galaxy, plotsToBeCreated, opts):
@@ -39,12 +22,14 @@ class plottingController(object):
     def run(self):
         for plotType in self.myPlotsToBeCreated:
             plotters = []
+            
             if plotType in self.dictPIPE3Dfiles.keys():
                 plotters.append(plotter_PIPE3D())
             if 'mpl4' in self.myOpts and plotType in self.dictMPL4files.keys():
                 plotters.append(plotter_DAP('MPL-4'))
             if 'mpl5' in self.myOpts and plotType in self.dictMPL5files.keys():
                 plotters.append(plotter_DAP('MPL-5'))
+                
             self.runPlotters(plotters, plotType)
             
     def runPlotters(self, plotters, plotType):
