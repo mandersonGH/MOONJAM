@@ -9,7 +9,7 @@ Created on Sep 8, 2017
 
 def main():
     #controller = Controller(sys.argv)
-    inputs = ['', r'C:\Users\Mande\Desktop\E + A Directory' + "\\",'mpl5','emlines_gflux']
+    inputs = ['', r'C:\Users\Mande\Desktop\E + A Directory' + "\\",'mpl5','whan']
     controller = Controller(inputs)
     controller.run()
     

@@ -9,30 +9,37 @@ import numpy as np
 from Plotting.DAP.plotEmLines import plotEmLines
 from Plotting.DAP.plotRatioPlots import plotRatioPlots
 
-def defaultCubePlots(EADir, galaxy , plotType, DAPtype):
-    
+
+def defaultCubePlots(EADir, galaxy, plotType, DAPtype):
+
     plotType = formatPlotType(plotType, DAPtype)
     emLineInd, emLineFancy = initializeEmLineDict(galaxy.myHDU, plotType)
     ratioPlots = eval(open("../resources/typesOfRatioPlots.txt").read())
     typesOfBPT = extractTypesOfBPT(DAPtype)
 
     if plotType in ratioPlots:
-        nFP = dF.assure_path_exists(EADir + '/' + DAPtype + '/PLOTS/DAP/' + galaxy.PLATEIFU + '/Ratio Plots/')
+        nFP = dF.assure_path_exists(
+            EADir + '/' + DAPtype + '/PLOTS/DAP/' + galaxy.PLATEIFU + '/Ratio Plots/')
         if plotType == 'BPT':
             for typeOfBPT in typesOfBPT:
-                plotRatioPlots(EADir, galaxy, plotType + typeOfBPT, emLineInd, emLineFancy, nFP)
+                plotRatioPlots(EADir, galaxy, plotType +
+                               typeOfBPT, emLineInd, emLineFancy, nFP)
         else:
-            plotRatioPlots(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP)
+            plotRatioPlots(EADir, galaxy, plotType,
+                           emLineInd, emLineFancy, nFP)
     else:
         # non ratio plot
-        nFP = dF.assure_path_exists(EADir + '/' + DAPtype + '/PLOTS/DAP/' + galaxy.PLATEIFU + '/' + plotType + '/')
+        nFP = dF.assure_path_exists(
+            EADir + '/' + DAPtype + '/PLOTS/DAP/' + galaxy.PLATEIFU + '/' + plotType + '/')
         dataInd, errInd, maskInd = getHduIndices(plotType)
         galaxy.extractDataCubes(dataInd, errInd, maskInd)
         correctErrorCube(galaxy, plotType)
-        plotEmLines(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP, dataInd)
-        
+        plotEmLines(EADir, galaxy, plotType, emLineInd,
+                    emLineFancy, nFP, dataInd)
+
+
 def formatPlotType(plotType, DAPtype):
-    if 'EMLINES_' in plotType:
+    if '_' in plotType:
         plotType = plotType[plotType.index('_') + 1:]
     plotType = plotType.upper()
     if DAPtype == 'MPL-5' and plotType == 'EW':
@@ -52,8 +59,8 @@ def correctErrorCube(galaxy, plotType):
     adjustmentScale = 1
     if plotType == 'GFLUX':
         adjustmentScale = 64
-    galaxy.myErrorCube = np.sqrt(np.divide(1, (galaxy.myErrorCube * adjustmentScale)))
- 
+    galaxy.myErrorCube = np.sqrt(
+        np.divide(1, (galaxy.myErrorCube * adjustmentScale)))
 
 
 def getHduIndices(plotType):
@@ -84,7 +91,7 @@ def initializeEmLineDict(hdu, plotType):
             except ValueError:
                 continue
             vVec = v.split("-")
-            newV = vVec[0] + '-' +  vVec[-1]
+            newV = vVec[0] + '-' + vVec[-1]
 
             emLineInd[newV] = i
             emLineFancy[newV] = reformatEmLineNames(v)

@@ -52,7 +52,7 @@ def plotEmLines(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP, dataInd):
         plotTitle = galaxy.PLATEIFU + ' :: ' + \
             plotType + ' :: ' + emLineFancy[j]
 
-        slice = EmissionLineSlice()
+        slice = EmissionLineSlice.EmissionLineSlice()
         slice.setName(emLineInd[j])
         slice.setFancyName(emLineFancy[j])
         slice.setData(galaxy.myDataCube[emLineInd[j]])

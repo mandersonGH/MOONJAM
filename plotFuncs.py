@@ -17,15 +17,21 @@ from astropy.io.fits.verify import VerifyError, VerifyWarning
 fontsize = 30
 
 
-def addAxisValues(galaxy, slice, units, hex_at_Cen, gal_at_Cen, axes2):
-    dOP.addCrossHairs(axes2, galaxy.PLATEIFU, galaxy.Re, hex_at_Cen)
+def plotAxisCrossSections(galaxy, slice, units, hex_at_Cen, gal_at_Cen, axes2):
+    try:
+        dOP.addCrossHairs(axes2, galaxy.PLATEIFU, galaxy.Re, hex_at_Cen)
+    except KeyError:
+        print("Center and axis unknown for this galaxy")
     dOP.addReCircles(axes2)
-    axes3 = plt.subplot(2, 2, 3)
-    plotMajMinAxis(galaxy, slice, units, hex_at_Cen,
-                   gal_at_Cen, axes3, 'major')
-    axes4 = plt.subplot(2, 2, 4)
-    plotMajMinAxis(galaxy, slice, units, hex_at_Cen,
-                   gal_at_Cen, axes4, 'minor')
+    try:
+        axes3 = plt.subplot(2, 2, 3)
+        plotMajMinAxis(galaxy, slice, units, hex_at_Cen,
+                       gal_at_Cen, axes3, 'major')
+        axes4 = plt.subplot(2, 2, 4)
+        plotMajMinAxis(galaxy, slice, units, hex_at_Cen,
+                       gal_at_Cen, axes4, 'minor')
+    except KeyError:
+        print("Center and axis unknown for this galaxy")
 
 
 def plotQuadPlot(EADir, galaxy, nFP, dataInd, slice, units, newFileName, plotTitle, vmax=None, vmin=None):
@@ -53,11 +59,11 @@ def plotQuadPlot(EADir, galaxy, nFP, dataInd, slice, units, newFileName, plotTit
 
     simple = 'No'
     if simple == 'No':
-        addAxisValues(galaxy, slice, units, hex_at_Cen, gal_at_Cen, axes2)
+        plotAxisCrossSections(galaxy, slice, units, hex_at_Cen, gal_at_Cen, axes2)
 
     # fig.tight_layout()
     plt.show()
-    print(jello)
+    3print(jello)
     plt.savefig(nFP + newFileName + '.png')
     # print(jello)
     plt.close()

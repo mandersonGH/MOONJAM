@@ -5,6 +5,7 @@ Created on Sep 8, 2017
 '''
 
 import numpy as np
+from EmissionLine.EmissionLineSlice import EmissionLineSlice
 np.seterr(divide='ignore', invalid='ignore')
 
 import matplotlib.pyplot as plt
@@ -16,12 +17,18 @@ import plotFuncs as pF
 import helperFuncs as hF
 import drawOnPlots as dOP
 
+
 def plotRatioPlots(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP):
     dataInd = 1
     units = 'Some units'
 
-    xValues, yValues, disValues, labelMat, mask, labels, counts = extractData(galaxy.myHDU, plotType, galaxy.Re, emLineInd, dataInd)
-    
+    xValues, yValues, disValues, labelMat, mask, labels, counts = extractData(
+        galaxy.myHDU, plotType, galaxy.Re, emLineInd, dataInd)
+
+    slice = EmissionLineSlice()
+    slice.setData(labelMat)
+    slice.setMask(mask)
+
 #     print(counts)
 #     if plotType == "BPT":
 #         labelVec = ['SF', 'Sy', 'Inter']
@@ -30,8 +37,9 @@ def plotRatioPlots(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP):
 #     print(plate_IFU)
 #     for i in range(len(labelVec)):
 #         print(labelVec[i] + ":  " + str(round(counts[i + 1] / counts[0] * 100, 2)) + '%')
-    
-    hex_at_Cen, gal_at_Cen = pT.getCenters(galaxy.myHDU, galaxy.PLATEIFU, dataInd)
+
+    hex_at_Cen, gal_at_Cen = pT.getCenters(
+        galaxy.myHDU, galaxy.PLATEIFU, dataInd)
 
     vmax = np.amax(labelMat)
     vmin = np.amin(labelMat)
@@ -43,40 +51,48 @@ def plotRatioPlots(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP):
     # plt.suptitle(plotType + ' Analysis :: ' + plate_IFU, fontsize=17)
 
     axes1 = plt.subplot(1, 3, 1)
-    pF.opticalImage(EADir, galaxy.myHDU, galaxy.PLATEIFU, galaxy.Re, galaxy.myCenterType, dataInd, axes1)
+    pF.opticalImage(EADir, galaxy, dataInd, axes1)
 
     axes2 = plt.subplot(1, 3, 2)
-    ratioAxes(plotType, emLineFancy, xValues, yValues, disValues, labels, axes2)
+    ratioAxes(plotType, emLineFancy, xValues,
+              yValues, disValues, labels, axes2)
 
     axes3 = plt.subplot(1, 3, 3)
-    pF.spatiallyResolvedPlot(galaxy.myHDU, plotType, plotType, galaxy.PLATEIFU, galaxy.Re, galaxy.myCenterType, dataInd, units, labelMat, mask, hex_at_Cen, gal_at_Cen, vmax, vmin, axes3)
+    pF.spatiallyResolvedPlot(galaxy, plotType, plotType, dataInd,
+                             units, slice, hex_at_Cen, gal_at_Cen, vmax, vmin, axes3)
     dOP.addReCircles(axes3)
     fig.tight_layout()
     # plt.show()
     # print(jello)
-    plt.savefig(nFP + galaxy.PLATEIFU + '_' + plotType + '.png', bbox_inches='tight')
+    plt.savefig(nFP + galaxy.PLATEIFU + '_' +
+                plotType + '.png', bbox_inches='tight')
     # print(jello)
     plt.close()
 
+
 def extractData(hdu, plotType, Re, emLineInd, dataInd):
     DAPtype = 'mpl5'
-    if str(hdu[0].header['VERSDRP2'])  == 'v1_5_0':
+    if str(hdu[0].header['VERSDRP2']) == 'v1_5_0':
         DAPtype = 'mpl4'
     xTopArray, yTopArray, xBotArray, yBotArray = getAllIndices(hdu, plotType)
 
     dMat = pT.createDistanceMatrix(hdu, Re, 'EMLINE_GFLUX')
 
-    xData = calculate_AxisMats(hdu, emLineInd, xTopArray[0], xBotArray[0], xTopArray[1], xBotArray[1], 'data')
-    xMask = calculate_AxisMats(hdu, emLineInd, xTopArray[0], xBotArray[0], xTopArray[3], xBotArray[3], 'mask')
+    xData = calculate_AxisMats(
+        hdu, emLineInd, xTopArray[0], xBotArray[0], xTopArray[1], xBotArray[1], 'data')
+    xMask = calculate_AxisMats(
+        hdu, emLineInd, xTopArray[0], xBotArray[0], xTopArray[3], xBotArray[3], 'mask')
 
-    yData = calculate_AxisMats(hdu, emLineInd, yTopArray[0], yBotArray[0], yTopArray[1], yBotArray[1], 'data')
-    yMask = calculate_AxisMats(hdu, emLineInd, yTopArray[0], yBotArray[0], yTopArray[3], yBotArray[3], 'mask')
+    yData = calculate_AxisMats(
+        hdu, emLineInd, yTopArray[0], yBotArray[0], yTopArray[1], yBotArray[1], 'data')
+    yMask = calculate_AxisMats(
+        hdu, emLineInd, yTopArray[0], yBotArray[0], yTopArray[3], yBotArray[3], 'mask')
 
     # xMask = xMask / 1000
     # yMask = yMask / 1000
 
     if DAPtype == 'mpl4':
-        mask = xMask + yMask  
+        mask = xMask + yMask
     else:
         mask = np.zeros(xMask.shape)
         mask[xMask < 0] = 1
@@ -108,7 +124,8 @@ def extractData(hdu, plotType, Re, emLineInd, dataInd):
         xData = np.log10(xData)
         yData = np.log10(yData)
 
-    xValues, yValues, disValues, labelMat, counts = processRatioData(plotType, xData, yData, dMat, mask)
+    xValues, yValues, disValues, labelMat, counts = processRatioData(
+        plotType, xData, yData, dMat, mask)
     # mask[labelMat == 2] = 1
     # mask[labelMat == 3] = 1
     mask[labelMat == 0] = 1
@@ -117,11 +134,11 @@ def extractData(hdu, plotType, Re, emLineInd, dataInd):
 
     return xValues, yValues, disValues, labelMat, mask, labels, counts
 
+
 def getAllIndices(hdu, plotType):
     DAPtype = 'mpl5'
-    if str(hdu[0].header['VERSDRP2'])  == 'v1_5_0':
+    if str(hdu[0].header['VERSDRP2']) == 'v1_5_0':
         DAPtype = 'mpl4'
-
 
     if plotType == 'WHAN':
         xTop = 'NII-6549'
@@ -185,9 +202,10 @@ def getAllIndices(hdu, plotType):
 
     return xTopArray, yTopArray, xBotArray, yBotArray
 
+
 def calculate_AxisMats(hdu, emLineInd, Top, Bot, TopMatInd, BotMatInd, Mat_type):
     TopMat = hdu[TopMatInd].data[emLineInd[Top]]
-    
+
     if Bot is not None:
         BotMat = hdu[BotMatInd].data[emLineInd[Bot]]
 
@@ -199,17 +217,18 @@ def calculate_AxisMats(hdu, emLineInd, Top, Bot, TopMatInd, BotMatInd, Mat_type)
         Mat = TopMat
     return Mat
 
+
 def processRatioData(plotType, xMat, yMat, dMat, mask):
     x = []
     y = []
     d = []
     labelMat = np.zeros(xMat.shape)
-    
+
     counts = np.zeros(4)
 
     for i in range(xMat.shape[0]):
         for j in range(xMat.shape[1]):
-            if mask[i, j] == 0 and ~np.isnan(xMat[i,j]) and ~np.isnan(yMat[i,j]):
+            if mask[i, j] == 0 and ~np.isnan(xMat[i, j]) and ~np.isnan(yMat[i, j]):
                 if dMat[i, j] <= 4:
                     x.append(xMat[i, j])
                     y.append(yMat[i, j])
@@ -238,6 +257,7 @@ def processRatioData(plotType, xMat, yMat, dMat, mask):
 
     return x, y, d, labelMat, counts
 
+
 def ratioAxes(plotType, emLineFancy, x, y, d, labels, axes):
     cmap = mclr.ListedColormap(['olive', 'tomato', 'darkturquoise', 'purple'])
     plt.scatter(x, y, c=d, s=20, lw=0.25, cmap=cmap, vmin=0, vmax=4)
@@ -256,7 +276,8 @@ def ratioAxes(plotType, emLineFancy, x, y, d, labels, axes):
     elif plotType == 'WHAN':
         limits = [-1.5, 1.0, -1, 3]
 
-    xmin, xmax, ymin, ymax = hF.ensureWideEnoughAxisRange(limits, [xmin, xmax, ymin, ymax], strict=True)
+    xmin, xmax, ymin, ymax = hF.ensureWideEnoughAxisRange(
+        limits, [xmin, xmax, ymin, ymax], strict=True)
 
     if plotType.startswith('BPT'):
         # for demarkations
@@ -289,7 +310,8 @@ def ratioAxes(plotType, emLineFancy, x, y, d, labels, axes):
         x2 = [-.4, -.4]
         y2 = [.5, ymax]
 
-    plt.title(plotType + " Diagram", fontsize=pF.fontsize + 5, fontweight='bold')
+    plt.title(plotType + " Diagram",
+              fontsize=pF.fontsize + 5, fontweight='bold')
     xTopLbl = labels[0]
     yTopLbl = labels[1]
     xBotLbl = labels[2]
@@ -305,8 +327,10 @@ def ratioAxes(plotType, emLineFancy, x, y, d, labels, axes):
     else:
         yDivideByStr = '/' + emLineFancy[yBotLbl]
 
-    plt.xlabel("log " + emLineFancy[xTopLbl] + xDivideByStr, fontsize=pF.fontsize)
-    plt.ylabel("log " + emLineFancy[yTopLbl] + yDivideByStr, fontsize=pF.fontsize)
+    plt.xlabel("log " + emLineFancy[xTopLbl] +
+               xDivideByStr, fontsize=pF.fontsize)
+    plt.ylabel("log " + emLineFancy[yTopLbl] +
+               yDivideByStr, fontsize=pF.fontsize)
 
     annotationSize = 27
 
@@ -318,7 +342,8 @@ def ratioAxes(plotType, emLineFancy, x, y, d, labels, axes):
 
         y_lastAnno = ymin + (ymax - ymin) * 0.1
         x_lastAnno = x1[hF.findIndex(y1, y_lastAnno)] + 0.05
-        axes.annotate('Inter', xy=(x_lastAnno, y_lastAnno), color='yellowgreen', fontsize=annotationSize, weight='bold')
+        axes.annotate('Inter', xy=(x_lastAnno, y_lastAnno),
+                      color='yellowgreen', fontsize=annotationSize, weight='bold')
     elif plotType == 'WHAN':
         axes.annotate('SF', xy=(0.1, 0.9), xytext=(0.1, 0.9), textcoords='axes fraction',
                       color='cornflowerblue', fontsize=annotationSize, weight='bold')
@@ -333,4 +358,3 @@ def ratioAxes(plotType, emLineFancy, x, y, d, labels, axes):
     plt.yticks(fontsize=pF.fontsize)
     axes.set_xlim([xmin, xmax])
     axes.set_ylim([ymin, ymax])
-
