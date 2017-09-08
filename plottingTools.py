@@ -3,7 +3,7 @@ from astropy.io import fits
 
 from EA_data import *
 from helperFuncs import *
-from fitsExtraction import *
+from GalaxyObject.fitsExtraction import *
 
 
 def axisEndpoints(plate_IFU, Re, hex_at_Cen):

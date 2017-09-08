@@ -1,19 +1,25 @@
+'''
+Created on Sep 8, 2017
+
+@author: Mande
+'''
+import direcFuncs as dF
 import numpy as np
 
-from plotRatioPlots import plotRatioPlots
-from plotEmLines import plotEmLines
-import direcFuncs as dF
+from Plotting.DAP.plotEmLines import plotEmLines
+from Plotting.DAP.plotRatioPlots import plotRatioPlots
 
-
-def defaultCubePlots(EADir, DAPtype, hdu, plotType, plate_IFU, Re, center):
-
+def defaultCubePlots(EADir, galaxy , plotType, DAPtype):
+    
+    print("here")
+    
     if '_' in plotType:
         plotType = plotType[plotType.index('_') + 1:]
 
     plotType = plotType.upper()
     if DAPtype == 'MPL-5' and plotType == 'EW':
         plotType = 'SEW'
-    emLineInd, emLineFancy = initializeEmLineDict(hdu, plotType)
+    emLineInd, emLineFancy = initializeEmLineDict(galaxy.myHDU, plotType)
 
     ratioPlots = ['WHAN', 'BPT']
     if DAPtype == 'MPL-4':
@@ -22,26 +28,26 @@ def defaultCubePlots(EADir, DAPtype, hdu, plotType, plate_IFU, Re, center):
         typesOfBPT = ['[NII]', '[SII]']
 
     if plotType in ratioPlots:
-        nFP = dF.assure_path_exists(EADir + '/' + DAPtype + '/PLOTS/DAP/' + plate_IFU + '/Ratio Plots/')
+        nFP = dF.assure_path_exists(EADir + '/' + DAPtype + '/PLOTS/DAP/' + galaxy.PLATEIFU + '/Ratio Plots/')
         if plotType == 'BPT':
             for typeOfBPT in typesOfBPT:
-                plotRatioPlots(EADir, hdu, plotType + typeOfBPT, plate_IFU, Re, center, emLineInd, emLineFancy, nFP)
+                plotRatioPlots(EADir, galaxy, plotType + typeOfBPT, emLineInd, emLineFancy, nFP)
         else:
-            plotRatioPlots(EADir, hdu, plotType, plate_IFU, Re, center, emLineInd, emLineFancy, nFP)
+            plotRatioPlots(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP)
     else:
-        nFP = dF.assure_path_exists(EADir + '/' + DAPtype + '/PLOTS/DAP/' + plate_IFU + '/' + plotType + '/')
+        nFP = dF.assure_path_exists(EADir + '/' + DAPtype + '/PLOTS/DAP/' + galaxy.PLATEIFU + '/' + plotType + '/')
 
 
-        dataInd, errInd, maskInd = getHduIndices(hdu, plotType)
+        dataInd, errInd, maskInd = getHduIndices(galaxy.myHDU, plotType)
 
-        dataCube = hdu[dataInd].data
+        dataCube = galaxy.myHDU[dataInd].data
         if plotType == 'GFLUX':
-            errCube = np.sqrt(np.divide(1, (hdu[errInd].data * 64)))
+            errCube = np.sqrt(np.divide(1, (galaxy.myHDU[errInd].data * 64)))
         else:
-            errCube = np.sqrt(np.divide(1, hdu[errInd].data))
-        maskCube = hdu[maskInd].data
+            errCube = np.sqrt(np.divide(1, galaxy.myHDU[errInd].data))
+        maskCube = galaxy.myHDU[maskInd].data
 
-        plotEmLines(EADir, hdu, plotType, plate_IFU, Re, center, emLineInd, emLineFancy, nFP, dataInd, dataCube, errCube, maskCube)
+        plotEmLines(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP, dataInd, dataCube, errCube, maskCube)
         
     
 

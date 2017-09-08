@@ -5,7 +5,7 @@ import matplotlib.cm as cm
 import matplotlib.colors as mclr
 
 import plottingTools as pT
-import fitsExtraction as fE
+from GalaxyObject import fitsExtraction as fE
 import dataCorrection as dC
 import helperFuncs as hF
 import drawOnPlots as dOP
@@ -17,10 +17,10 @@ from astropy.io.fits.verify import VerifyError, VerifyWarning
 fontsize = 30
 
 
-def plotQuadPlot(EADir, hdu, plate_IFU, Re, center, nFP, dataInd, dataMat, errMat, maskMat, units, newFileName, plotTitle, vmax=None, vmin=None):
+def plotQuadPlot(EADir, galaxy, nFP, dataInd, dataMat, errMat, maskMat, units, newFileName, plotTitle, vmax=None, vmin=None):
     # print(center)
     simple = 'Yes'
-    hex_at_Cen, gal_at_Cen = fE.getCenters(hdu, plate_IFU, dataInd)
+    hex_at_Cen, gal_at_Cen = fE.getCenters(galaxy.myHDU, galaxy.PLATEIFU, dataInd)
 
     # print("Masking " + str(round(float(sum(sum(maskMat)) * 100) /
     #                              (maskMat.shape[0] * maskMat.shape[1]), 2)) + ' percent of the data matrix; ~40 percent is great data')
@@ -33,24 +33,24 @@ def plotQuadPlot(EADir, hdu, plate_IFU, Re, center, nFP, dataInd, dataMat, errMa
     plt.suptitle(plotTitle, fontsize=fontsize + 5, fontweight='bold')
 
     axes1 = plt.subplot(2, 2, 1)
-    opticalImage(EADir, hdu, plate_IFU, Re, center, dataInd, axes1)
+    opticalImage(EADir, galaxy.myHDU, galaxy.PLATEIFU, galaxy.Re, galaxy.myCenterType, dataInd, axes1)
     # dOP.plotHexagon(axes1, plate_IFU)
 
     axes2 = plt.subplot(2, 2, 2)
-    spatiallyResolvedPlot(hdu, "", newFileName, plate_IFU, Re, center, dataInd, units, 
+    spatiallyResolvedPlot(galaxy.myHDU, "", newFileName, galaxy.PLATEIFU, galaxy.Re, galaxy.myCenterType, dataInd, units, 
                           dataMat, maskMat, hex_at_Cen, gal_at_Cen, vmax, vmin, axes2)
 
     if simple == 'No':
-      dOP.addCrossHairs(axes2, plate_IFU, Re, hex_at_Cen)
+      dOP.addCrossHairs(axes2, galaxy.PLATEIFU, galaxy.Re, hex_at_Cen)
       dOP.addReCircles(axes2)
 
       axes3 = plt.subplot(2, 2, 3)
-      plotMajMinAxis(plate_IFU, Re, center, dataMat, errMat, maskMat, 
+      plotMajMinAxis(galaxy.PLATEIFU, galaxy.Re, galaxy.myCenterType, dataMat, errMat, maskMat, 
                      units, hex_at_Cen, gal_at_Cen, axes3, 'major')
 
 
       axes4 = plt.subplot(2, 2, 4)
-      plotMajMinAxis(plate_IFU, Re, center, dataMat, errMat, maskMat, 
+      plotMajMinAxis(galaxy.PLATEIFU, galaxy.Re, galaxy.myCenterType, dataMat, errMat, maskMat, 
                      units, hex_at_Cen, gal_at_Cen, axes4, 'minor')
 
     # fig.tight_layout()

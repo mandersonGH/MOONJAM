@@ -1,23 +1,25 @@
-import numpy as np
+'''
+Created on Sep 8, 2017
 
+@author: Mande
+'''
+import numpy as np
+import GalaxyObject.fitsExtraction as fE
 import dataCorrection as dC
 import plotFuncs as pF
-import helperFuncs as hF
-import fitsExtraction as fE
 
-
-def plotEmLines(EADir, hdu, plotType, plate_IFU, Re, center, emLineInd, emLineFancy, nFP, dataInd, dataCube, errCube, maskCube):
-
-    units = '$' + hdu[dataInd].header['BUNIT'] + '$'
-    hex, gal = fE.getCenters(hdu, plate_IFU, dataInd)
+def plotEmLines(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP, dataInd, dataCube, errCube, maskCube):
+    
+    units = '$' + galaxy.myHDU[dataInd].header['BUNIT'] + '$'
+    hex, gal = fE.getCenters(galaxy.myHDU, galaxy.PLATEIFU, dataInd)
     # cycle through 11 chosen wavelengths
     for j in emLineInd.keys():
         # print(lineType + ": " + j)
 
-        newFileName = plate_IFU + '_' + plotType + \
+        newFileName = galaxy.PLATEIFU + '_' + plotType + \
             '_' + j
 
-        plotTitle = plate_IFU + ' :: ' + plotType + ' :: ' + emLineFancy[j]
+        plotTitle = galaxy.PLATEIFU + ' :: ' + plotType + ' :: ' + emLineFancy[j]
 
         dataMat = dataCube[emLineInd[j]]
         errMat = errCube[emLineInd[j]]
@@ -58,10 +60,7 @@ def plotEmLines(EADir, hdu, plotType, plate_IFU, Re, center, emLineInd, emLineFa
         #     vmin = dC.pickVMIN(sliceMat, 1)
 
         pF.plotQuadPlot(EADir,
-                        hdu,
-                        plate_IFU,
-                        Re,
-                        center,
+                        galaxy,
                         nFP,
                         dataInd,
                         dataMat,

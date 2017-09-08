@@ -8,7 +8,7 @@ import string
 import direcFuncs as dF
 import plottingTools as pT
 import plotFuncs as pF
-import fitsExtraction as fE
+from GalaxyObject import fitsExtraction as fE
 
 from plotSFH import plotSFH
 
