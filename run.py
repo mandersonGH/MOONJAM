@@ -11,8 +11,8 @@ sys.path.append(pythonDirectoryPathname + '/plots/PIPE3D')
 sys.path.append(pythonDirectoryPathname + '/plots/DAP')
 
 import direcFuncs as dF
-from plotDAP import plotDAP
-from plotPIPE3D import plotPIPE3D
+from plots.DAP.plotDAP import plotDAP
+from plots.PIPE3D.plotPIPE3D import plotPIPE3D
 
 dictPIPE3Dfiles = {'sfh': 'p_e.rad_SFH_lum_Mass.fits',
                    '_____': 'p_e.Sigma_Mass.fits',
