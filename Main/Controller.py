@@ -6,7 +6,7 @@ Created on Sep 8, 2017
 import numpy as np
 from Utilities.Stopwatch import Stopwatch
 from collections import defaultdict
-import direcFuncs as dF
+import Utilities.direcFuncs as dF
 from astropy.io import fits
 from GalaxyObject.Galaxy import Galaxy
 from PlottingDrivers.plottingController import plottingController

@@ -4,7 +4,7 @@ Created on Sep 8, 2017
 @author: Mande
 '''
 
-import direcFuncs as dF
+import Utilities.direcFuncs as dF
 import GalaxyObject.fitsExtraction as fE
 
 
