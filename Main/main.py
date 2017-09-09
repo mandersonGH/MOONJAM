@@ -9,9 +9,9 @@ Created on Sep 8, 2017
 
 
 def main():
-    #controller = Controller(sys.argv)
-    inputs = ['', r'C:\Users\Mande\Desktop\E + A Directory' + "\\", 'mpl4','pipe3d', 'requested','elines','lum_fracs','indices.cs']
-    controller = Controller(inputs)
+    controller = Controller(sys.argv)
+    # inputs = ['', r'C:\Users\Mande\Desktop\E + A Directory' + "\\", 'mpl4','pipe3d', 'requested','elines','lum_fracs','indices.cs']
+    # controller = Controller(inputs)
     controller.run()
 
 
