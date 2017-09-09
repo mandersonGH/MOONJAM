@@ -5,9 +5,6 @@ Created on Sep 8, 2017
 '''
 
 import numpy as np
-from EmissionLine.EmissionLineSlice import EmissionLineSlice
-np.seterr(divide='ignore', invalid='ignore')
-
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib.colors as mclr
@@ -17,10 +14,12 @@ import plotFuncs as pF
 import helperFuncs as hF
 import drawOnPlots as dOP
 
+from EmissionLine.EmissionLineSlice import EmissionLineSlice
+np.seterr(divide='ignore', invalid='ignore')
+
 
 def plotRatioPlots(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP):
     dataInd = 1
-    units = 'Some units'
 
     xValues, yValues, disValues, labelMat, mask, labels, counts = extractData(
         galaxy.myHDU, plotType, galaxy.Re, emLineInd, dataInd)
@@ -28,6 +27,7 @@ def plotRatioPlots(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP):
     slice = EmissionLineSlice()
     slice.setData(labelMat)
     slice.setMask(mask)
+    slice.setUnits('Some units')
 
 #     print(counts)
 #     if plotType == "BPT":
