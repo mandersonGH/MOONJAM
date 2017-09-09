@@ -5,6 +5,7 @@ Created on Sep 8, 2017
 '''
 import direcFuncs as dF
 import numpy as np
+import os
 
 from Plotting.DAP.plotEmLines import plotEmLines
 from Plotting.DAP.plotRatioPlots import plotRatioPlots
@@ -14,7 +15,11 @@ def defaultCubePlots(EADir, galaxy, plotType, DAPtype):
 
     plotType = formatPlotType(plotType, DAPtype)
     emLineInd, emLineFancy = initializeEmLineDict(galaxy.myHDU, plotType)
-    ratioPlots = eval(open("../resources/typesOfRatioPlots.txt").read())
+    
+    resourceFolder = os.path.abspath(
+        os.path.join(__file__, "../../..")) + "/resources/"
+    
+    ratioPlots = eval(open(resourceFolder + "typesOfRatioPlots.txt").read())
     typesOfBPT = extractTypesOfBPT(DAPtype)
 
     if plotType in ratioPlots:

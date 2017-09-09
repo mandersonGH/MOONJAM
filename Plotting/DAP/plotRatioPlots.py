@@ -59,7 +59,7 @@ def plotRatioPlots(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP):
 
     axes3 = plt.subplot(1, 3, 3)
     pF.spatiallyResolvedPlot(galaxy, plotType, plotType, dataInd,
-                             units, slice, hex_at_Cen, gal_at_Cen, vmax, vmin, axes3)
+                             slice, hex_at_Cen, gal_at_Cen, vmax, vmin, axes3)
     dOP.addReCircles(axes3)
     fig.tight_layout()
     # plt.show()

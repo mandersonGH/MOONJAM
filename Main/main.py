@@ -1,5 +1,8 @@
-from Controller import Controller
-import sys
+import os, sys
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.dirname(CURRENT_DIR))
+
+from Main.Controller import Controller
 
 '''
 Created on Sep 8, 2017

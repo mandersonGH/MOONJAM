@@ -10,13 +10,17 @@ import direcFuncs as dF
 from astropy.io import fits
 from GalaxyObject.Galaxy import Galaxy
 from Plotting.plottingController import plottingController
+import os
 
 
 class Controller:
 
-    dictMPL4files = eval(open("../resources/dictMPL4files.txt").read())
-    dictMPL5files = eval(open("../resources/dictMPL5files.txt").read())
-    dictPIPE3Dfiles = eval(open("../resources/dictPIPE3Dfiles.txt").read())
+    resourceFolder = os.path.abspath(
+        os.path.join(__file__, "../..")) + "/resources/"
+
+    dictMPL4files = eval(open(resourceFolder + "dictMPL4files.txt").read())
+    dictMPL5files = eval(open(resourceFolder + "dictMPL5files.txt").read())
+    dictPIPE3Dfiles = eval(open(resourceFolder + "dictPIPE3Dfiles.txt").read())
 
     def __init__(self, args):
         self.inputs = args
@@ -26,7 +30,6 @@ class Controller:
         # EADirectory - where all plots and data are saved
         # opts - the arguments following the run command that dictate what
         # plots the user wants to produce
-
         timer = Stopwatch()
         timer.start()
         fileDict = self.requiredFileSearch(opts, EADirectory)
@@ -61,9 +64,10 @@ class Controller:
         if 'mpl5' in opts:
             fileDict.update(self.makeFilePlotDict(
                 opts, EADirectory + "MPL-5\\DATA\\DAP\\", self.dictMPL5files))
-            #if 'pipe3d' in opts:
+            # if 'pipe3d' in opts:
             #    fileDict.update(self.makeFilePlotDict(
-            #        opts, EADirectory + "MPL-5\\DATA\\PIPE3D\\", self.dictPIPE3Dfiles))
+            # opts, EADirectory + "MPL-5\\DATA\\PIPE3D\\",
+            # self.dictPIPE3Dfiles))
 
         return fileDict
 
@@ -73,8 +77,10 @@ class Controller:
             if key in opts:
                 fileType = dictFileTypes[key]
                 fileList = dF.locate(fileType, True, rootD=EADirectory)
-                fileList_gz = dF.locate(fileType + '.gz', True, rootD=EADirectory)
-                fileList_gz = [x for x in fileList_gz if x[:-3] not in fileList]
+                fileList_gz = dF.locate(
+                    fileType + '.gz', True, rootD=EADirectory)
+                fileList_gz = [
+                    x for x in fileList_gz if x[:-3] not in fileList]
                 fileList = np.append(fileList, fileList_gz)
                 for file in fileList:
                     filePlotDict[file].append(key)

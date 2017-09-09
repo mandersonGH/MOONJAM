@@ -5,13 +5,15 @@ Created on Sep 8, 2017
 '''
 from Plotting.DAP.plotDAP import plotter_DAP
 from Plotting.PIPE3D.plotPIPE3D import plotter_PIPE3D
+import os
 
 
 class plottingController(object):
-
-    dictMPL4files = eval(open("../resources/dictMPL4files.txt").read())
-    dictMPL5files = eval(open("../resources/dictMPL5files.txt").read())
-    dictPIPE3Dfiles = eval(open("../resources/dictPIPE3Dfiles.txt").read())
+    resourceFolder = os.path.abspath(
+        os.path.join(__file__, "../..")) + "/resources/"
+    dictMPL4files = eval(open(resourceFolder + "dictMPL4files.txt").read())
+    dictMPL5files = eval(open(resourceFolder + "dictMPL5files.txt").read())
+    dictPIPE3Dfiles = eval(open(resourceFolder + "dictPIPE3Dfiles.txt").read())
 
     def __init__(self, EADirectory, galaxy, plotsToBeCreated, opts):
         self.myEADirectory = EADirectory

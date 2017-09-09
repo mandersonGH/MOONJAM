@@ -7,12 +7,17 @@ Created on Sep 8, 2017
 from Plotting.PlotterABC import PlotterABC
 from Plotting.DAP.defaultCubePlots import defaultCubePlots
 from Plotting.DAP.LOGCUBE_Plots import LOGCUBE_Plots
+import sys
+import os
 
 
 class plotter_DAP(PlotterABC):
+    
+    resourceFolder = os.path.abspath(
+        os.path.join(__file__, "../../..")) + "/resources/"
 
     potentialDefaultCubePlots = eval(
-        open("../resources/potentialDefaultCubePlots.txt").read())
+        open(resourceFolder + "potentialDefaultCubePlots.txt").read())
 
     def __init__(self, mplNum):
         self.DAPtype = mplNum
