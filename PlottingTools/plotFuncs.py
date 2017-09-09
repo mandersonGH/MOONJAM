@@ -4,7 +4,7 @@ import matplotlib.image as mpimg
 import matplotlib.cm as cm
 import matplotlib.colors as mclr
 
-import plottingTools as pT
+import PlottingTools.plottingTools as pT
 from GalaxyObject import fitsExtraction as fE
 import dataCorrection as dC
 import Utilities.helperFuncs as hF

@@ -5,7 +5,7 @@ from matplotlib.patches import RegularPolygon
 from matplotlib.collections import PatchCollection
 
 from resources import EA_data
-import plottingTools as pT
+import PlottingTools.plottingTools as pT
 
 colorForLines = 'aqua'
 lw = 2

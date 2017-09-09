@@ -30,6 +30,7 @@ class Controller:
         # EADirectory - where all plots and data are saved
         # opts - the arguments following the run command that dictate what
         # plots the user wants to produce
+        print(EADirectory)
         timer = Stopwatch()
         timer.start()
         fileDict = self.requiredFileSearch(opts, EADirectory)
