@@ -53,7 +53,7 @@ times = [1.00E+06,
 
 
 def plotSFH(EADir, galaxy):
-    nFP = dF.assure_path_exists(EADir + '/PLOTS/PIPE3D/SFH/')
+    nFP = dF.assure_path_exists(EADir + '/MPL-4/PLOTS/PIPE3D/SFH/')
 
     dCube = galaxy.myHDU[0].data
 

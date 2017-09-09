@@ -61,6 +61,9 @@ class Controller:
         if 'mpl5' in opts:
             fileDict.update(self.makeFilePlotDict(
                 opts, EADirectory + "MPL-5\\DATA\\DAP\\", self.dictMPL5files))
+            #if 'pipe3d' in opts:
+            #    fileDict.update(self.makeFilePlotDict(
+            #        opts, EADirectory + "MPL-5\\DATA\\PIPE3D\\", self.dictPIPE3Dfiles))
 
         return fileDict
 

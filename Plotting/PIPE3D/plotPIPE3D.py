@@ -22,7 +22,6 @@ from Plotting.PIPE3D.plotSFH import plotSFH
 
 class plotter_PIPE3D(PlotterABC):
 
-
     def createSlice(self, dataMat, maskMat, units):
         slice = EmissionLineSlice()
         slice.setData(dataMat)
@@ -33,7 +32,7 @@ class plotter_PIPE3D(PlotterABC):
     def plot(self, EADir, galaxy, plotType):
 
         if plotType == 'sfh':
-            plotSFH(galaxy)
+            plotSFH(EADir, galaxy)
         else:
             if plotType == 'flux_elines':
                 if not galaxy.myFilename.startswith(plotType):
@@ -128,7 +127,6 @@ class plotter_PIPE3D(PlotterABC):
                                     newFileName,
                                     EADir,
                                     slice,
-                                    errMat,
                                     units,
                                     vmin=None,
                                     vmax=None)
@@ -141,8 +139,8 @@ class plotter_PIPE3D(PlotterABC):
                         dictPlotTitles_Index, dictPlotTitles_Pair[key], galaxy, dataInd, NAXIS3)
                     if dataMat1 is None or dataMat2 is None:
                         continue
-                    slice1 = self.createSlice(dataMat1, maskMat1, units)
-                    slice2 = self.createSlice(dataMat2, maskMat2, units)
+                    slice1 = self.createSlice(dataMat1, maskMat1, units1)
+                    slice2 = self.createSlice(dataMat2, maskMat2, units2)
                     pF.plotComparisonPlots(galaxy,
                                            dataInd,
                                            nFP,
