@@ -6,6 +6,7 @@ Created on Sep 8, 2017
 
 from Plotting.PlotterABC import PlotterABC
 from Plotting.PIPE3D.plotSFH import plotSFH
+import GalaxyObject.fitsExtraction as fE
 
 
 class plotter_PIPE3D(PlotterABC):
@@ -17,38 +18,45 @@ class plotter_PIPE3D(PlotterABC):
         else:
             if plotType == 'flux_elines':
                 if not galaxy.myFilename.startswith(plotType):
-                    print("No plots of type (" + plotType + ") to make for the file " + galaxy.myFilename)
+                    print("No plots of type (" + plotType +
+                          ") to make for the file " + galaxy.myFilename)
                     return
             if plotType == 'indices.cs':
                 if not galaxy.myFilename.startswith(plotType[:7]):
-                    print("No plots of type (" + plotType + ") to make for the file " + galaxy.myFilename)
+                    print("No plots of type (" + plotType +
+                          ") to make for the file " + galaxy.myFilename)
                     return
-            
+
             center = 'HEX'
-    
+
             NAXIS3 = fE.getNAXIS3(galaxy.myHDU)
-    
+
             titleHdr = fE.getTitleHeaderPrefix(galaxy.myHDU)
-    
+
             dataInd = 0
-    
+
             dictPlotTitles_Index, dictPlotTitles_Error, dictPlotTitles_Pair = createDictionaries(
-                hdu, NAXIS3, titleHdr, dataInd, filename)
-    
+                galaxy.myHDU, NAXIS3, titleHdr, dataInd, filename)
+
             if plotType == 'requested':
-                requestedWithin = [['velocity', 'stellar population'], ['Ha'], ['Hd'], ['Halpha']]
-    
+                requestedWithin = [['velocity', 'stellar population'], [
+                    'Ha'], ['Hd'], ['Halpha']]
+
                 dictPlotTitles_Index, dictPlotTitles_Error, dictPlotTitles_Pair = removeNonRequested(
                     dictPlotTitles_Index, dictPlotTitles_Error, dictPlotTitles_Pair, requestedWithin)
-    
-                nFP = dF.assure_path_exists(EADir + '/PLOTS/PIPE3D/' + plotType + '/' + plate_IFU + '/')
+
+                nFP = dF.assure_path_exists(
+                    EADir + '/PLOTS/PIPE3D/' + plotType + '/' + plate_IFU + '/')
                 nFPraw = ''
             else:
-                nFP = dF.assure_path_exists(EADir + '/PLOTS/PIPE3D/' + plate_IFU + '/' + plotType + '/')
-                nFPraw = dF.assure_path_exists(EADir + '/PLOTS/PIPE3D/' + plate_IFU + '/' + plotType + '/RAW/')
-    
+                nFP = dF.assure_path_exists(
+                    EADir + '/PLOTS/PIPE3D/' + plate_IFU + '/' + plotType + '/')
+                nFPraw = dF.assure_path_exists(
+                    EADir + '/PLOTS/PIPE3D/' + plate_IFU + '/' + plotType + '/RAW/')
+
             if not bool(dictPlotTitles_Index):
-                print("No plots of type (" + plotType + ") to make for the file " + filename)
+                print("No plots of type (" + plotType +
+                      ") to make for the file " + filename)
                 return
             elif nFPraw != '':
                 hex_at_Cen, gal_at_Cen = fE.getCenters(hdu, plate_IFU, dataInd)
@@ -85,7 +93,7 @@ class plotter_PIPE3D(PlotterABC):
                     plt.savefig(nFPraw + newFileName + '.png')
                     # print(jello)
                     plt.close()
-    
+
             if bool(dictPlotTitles_Error):
                 for key in dictPlotTitles_Error.keys():
                     dataMat, maskMat, newFileName, plotTitle, units = prepData(
@@ -109,7 +117,7 @@ class plotter_PIPE3D(PlotterABC):
                                     units,
                                     vmin=None,
                                     vmax=None)
-    
+
             if bool(dictPlotTitles_Pair):
                 for key in dictPlotTitles_Pair.keys():
                     dataMat1, maskMat1, newFileName1, plotTitle1, units1 = prepData(
@@ -136,8 +144,7 @@ class plotter_PIPE3D(PlotterABC):
                                            center,
                                            units1,
                                            units2)
-    
-    
+
     def prepData(self, titleDict, key, hdu, filename, plate_IFU, dataInd, NAXIS3):
         if NAXIS3 == 0:
             dataMat = hdu[dataInd].data
@@ -145,13 +152,13 @@ class plotter_PIPE3D(PlotterABC):
         else:
             dataMat = hdu[dataInd].data[titleDict[key]]
             newFileName = key
-    
+
         maskMat = np.zeros(dataMat.shape)
         maskMat[dataMat == 0] = 1
         maskMat[np.abs(dataMat) > 30000] = 1
-    
+
         plotTitle = plate_IFU + " :: " + newFileName
-    
+
         if not filename.startswith('flux_elines') and not filename.startswith('indices'):
             if titleDict[key] > 99:
                 units = hdu[dataInd].header["UNITS_" + str(99)]
@@ -163,25 +170,24 @@ class plotter_PIPE3D(PlotterABC):
                 dataMat = np.log10(dataMat)
             elif units == 'Solar metallicity':
                 units = '[Z/H]'
-    
+
             if units == 'km':
                 units = 'km/s'
-    
+
             if 'mass weighted' in newFileName:
                 units = units + '_{MW}'
             elif 'luminosity weighted' in newFileName:
                 units = units + '_{LW}'
-    
+
             units = '$' + units + '$'
         else:
             units = ""
-    
+
         newFileName = newFileName.strip()
         newFileName = string.capwords(newFileName)
-    
+
         return dataMat, maskMat, newFileName, plotTitle, units
-    
-    
+
     def removeNonRequested(self, dictPlotTitles_Index, dictPlotTitles_Error, dictPlotTitles_Pair, requestedWithin):
         for key in dictPlotTitles_Index.keys():
             flag = False
@@ -199,28 +205,30 @@ class plotter_PIPE3D(PlotterABC):
                 if key in dictPlotTitles_Pair.keys():
                     del dictPlotTitles_Pair[key]
         return dictPlotTitles_Index, dictPlotTitles_Error, dictPlotTitles_Pair
-    
-    
+
     def createDictionaries(self, hdu, NAXIS3, titleHdr, dataInd, filename):
         dictPlotTitles_Index = {}
         dictPlotTitles_Error = {}
         dictPlotTitles_Pair = {}
-    
+
         for i in range(NAXIS3):
             try:
                 plotTitle = hdu[dataInd].header[titleHdr + str(i)]
                 plotTitle = plotTitle.strip()
                 dictPlotTitles_Index[plotTitle] = i
             except VerifyError:
-                print('The header title ' + titleHdr + str(i) + ' is corrupt for the file ' + filename)
+                print('The header title ' + titleHdr + str(i) +
+                      ' is corrupt for the file ' + filename)
                 continue
-    
-        errorPrefixes = ['e_', 'error in the ', 'error of the ', 'error of ', 'error in ', 'error ']
-        pairSuffixes = ['weighted metallicity of the stellar population', 'weighted age of the stellar population', ]
+
+        errorPrefixes = ['e_', 'error in the ',
+                         'error of the ', 'error of ', 'error in ', 'error ']
+        pairSuffixes = ['weighted metallicity of the stellar population',
+                        'weighted age of the stellar population', ]
         pairFlagsFirstFound = [False, False]
         pairFlagsSecondFound = [False, False]
         tempPairKey = ['', '']
-    
+
         for key in dictPlotTitles_Index.keys():
             for errorPrefix in errorPrefixes:
                 if errorPrefix in key:
@@ -232,7 +240,7 @@ class plotter_PIPE3D(PlotterABC):
                             if key != key2 and key2.endswith(TitleFromWhereErrorBelongs):
                                 dictPlotTitles_Error[key2] = key
                     break
-    
+
             for i in range(len(pairSuffixes)):
                 pairSuffix = pairSuffixes[i]
                 if not pairFlagsFirstFound[i] and key.endswith(pairSuffix):
@@ -242,5 +250,5 @@ class plotter_PIPE3D(PlotterABC):
                     # print(str(i) + " " + str(pairFlagsSecondFound[i]))
                     dictPlotTitles_Pair[tempPairKey[i]] = key
                     pairFlagsSecondFound[i] = True
-    
+
         return dictPlotTitles_Index, dictPlotTitles_Error, dictPlotTitles_Pair

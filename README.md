@@ -1,8 +1,8 @@
-Hello!
-
-Welcome to MOONJAM!!
+# Hello! Welcome to MOONJAM!!
 
 ########################################
+
+### Purpose:
 
 This program serves a single purpose. It creates and saves plots for galaxies surveryed by SDSS MaNGA MPL-4 and MPL-5. 
 
@@ -13,21 +13,23 @@ This program can make WHAN Diagrams, BPT Diagrams, Spatially Resolved Emission L
 
 ########################################
 
+### The Team:
+
 This program was created by the MOONJAM team in the summer of 2016 during an REU Internship at the American Museum of Natural History. 
 
 The contributers to the project are: (listed alphabetically and listed with their affliated institution at the time) 
-Miguel Ricardo Anderson (Duke) 
-Julia Falcone (Case Western) 
-Olivia James (CUNY York College) 
-Allen Liu (Harvard) 
-Nicole Wallack (Caltech) 
-Muhammad Wally (Xavier U. of Louisiana) 
-Olivia Weaver (Florida Atlantic) 
-Supervisor - Dr. Charles Liu (CUNY - Staten Island)
+- Miguel Ricardo Anderson (Duke) 
+- Julia Falcone (Case Western) 
+- Olivia James (CUNY York College) 
+- Allen Liu (Harvard) 
+- Nicole Wallack (Caltech) 
+- Muhammad Wally (Xavier U. of Louisiana) 
+- Olivia Weaver (Florida Atlantic) 
+- Supervisor - Dr. Charles Liu (CUNY - Staten Island)
 
 #########################################
 
-Requirements to run:
+### Requirements to run:
  - Python (2.6 or later, there might be compatibility issues in Python 3 - this was not tested)
  - Astropy and several other additional python packages
  	(an installation of Anaconda will provide Python and all required packages)
@@ -36,7 +38,7 @@ Requirements to run:
  
 #########################################
  
-Directory Requirements:
+### Directory Requirements:
 
 The directory must be organized with a specific hierarchy due to the saving mechanisms in the program.
 
@@ -56,7 +58,33 @@ The directory must be organized with a specific hierarchy due to the saving mech
 5. Within a galaxy's folder should be the .fits or .fits.gz file.
 
 #######################################################
-How to use the program:
+
+### How to use the program:
 
 1. Open command prompt
-2. Change directory to the 
+2. Change directory to the folder containing the program (this should be titled MOONJAM)
+3. Run the main.py module in python with additional arguments as required
+	 - First type "python"
+	 - Followed by"main.py"
+	 - Then the directory that contains the galaxy .fits files (as layed out above in Directory Requirements)
+	 - Then the types of diagrams wanted along with sources of the .fits files
+	 	- Additional Parameters: (case insensitive)
+	 		- "WHAN" for WHAN diagrams
+	 		- "BPT" for BPT diagrams
+	 		- "EMLINES_GFLUX" for emission line plots using GFLUX measurements
+	 		- "EMLINES_EW" for emission line plots using GFLUX measurements
+	 		- "ReSpectra" for radial spectral binning plots
+	 		- "MPL4" to use galaxies included in MPL-4
+	 		- "MPL5" to use galaxies included in MPL-5
+	 		- "PIPE3D" to create PIPE3D plots (with its own options listed as the keys of a dictionary in "./resources/dictPIPE3Dfiles.txt"
+	- Examples:
+		- ``` python main.py ../E + A Directory/ mpl5 emlines_gflux ``` 
+		- ``` python main.py ../E + A Directory/ mpl4 bpt emlines_gflux ``` 
+		- ``` python main.py ../E + A Directory/ mpl5 mpl4 bpt whan emlines_ew ``` 
+
+That should do it!! In the directory supplied there should be a new PLOTS folder with the plots saved.
+
+Good luck finding E + A's or anything else that can be classified with this!!
+
+Please [email me](mailto:manderson1301@gmail.com) if you have questions with the subject line "MOONJAM Question"
+
