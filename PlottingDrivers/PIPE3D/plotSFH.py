@@ -4,8 +4,8 @@ Created on Sep 8, 2017
 @author: Mande
 '''
 
-import direcFuncs as dF
-import plottingTools as pT
+import Utilities.direcFuncs as dF
+import PlottingTools.plottingTools as pT
 from astropy.io import fits
 import matplotlib.pyplot as plt
 import numpy as np

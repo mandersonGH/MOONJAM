@@ -9,7 +9,7 @@ from collections import defaultdict
 import direcFuncs as dF
 from astropy.io import fits
 from GalaxyObject.Galaxy import Galaxy
-from Plotting.plottingController import plottingController
+from PlottingDrivers.plottingController import plottingController
 import os
 
 

@@ -6,9 +6,8 @@ Created on Sep 8, 2017
 import numpy as np
 import GalaxyObject.fitsExtraction as fE
 import dataCorrection as dC
-import plotFuncs as pF
+import PlottingTools.plotFuncs as pF
 from EmissionLine import EmissionLineSlice
-
 
 
 def pickBoundsForColorBar(slice):
@@ -27,20 +26,21 @@ def pickBoundsForColorBar(slice):
 #         for y in range(dataMat.shape[0]):
 #             for x in range(dataMat.shape[1]):
 #                 if maskMat[x, y] == 0 and dataMat[x, y] > maxx:
-#                     tempDist = hF.calculateDistance(x, y, gal[0], gal[1]) / Re
+#                     tempDist = calculateDistance(x, y, gal[0], gal[1]) / Re
 #                     if tempDist < 3.6:
 #                         maxx = dataMat[x, y]
 #                         maxInds = [x, y]
 #
 #
 #
-#         print(j + ": " + str(round( hF.calculateDistance(maxInds[0], maxInds[1], gal[0], gal[1])/ Re, 2)) )
+#         print(j + ": " + str(round( calculateDistance(maxInds[0], maxInds[1], gal[0], gal[1])/ Re, 2)) )
 # set lower colormap value
 # if typeStr is '':
 #     vmin = 0
 # else:
 #     vmin = dC.pickVMIN(sliceMat, 1)
     return vmax, vmin
+
 
 def plotEmLines(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP, dataInd):
 
@@ -49,7 +49,7 @@ def plotEmLines(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP, dataInd):
 #     for j in galaxy.myHDU[dataInd].header.keys():
 #         print(str(j) + "  ::   " + str(galaxy.myHDU[dataInd].header[j]))
 #     #galaxy.printInfo()
-    
+
     # cycle through 11 chosen wavelengths
     for j in emLineInd.keys():
         # print(lineType + ": " + j)
@@ -83,4 +83,3 @@ def plotEmLines(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP, dataInd):
                         plotTitle,
                         vmax=vmax,
                         vmin=vmin)
-        

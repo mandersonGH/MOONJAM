@@ -3,22 +3,11 @@ import os
 import fnmatch
 
 
-def getEADirAndFilename(file):
-    fileVec = file.split("\\")
+def getFilename(fullFilePath):
+    fileVec = fullFilePath.split("\\")
     filename = fileVec[-1]
-
-    ind = fileVec.index('9 Poster Galaxies')
-
-    del fileVec[ind + 1:]
-    EADir = '\\'.join(fileVec)
-
-    return EADir, filename
-
-def getFilename(file):
-    fileVec = file.split("\\")
-    filename = fileVec[-1]
-
     return filename
+
 
 def assure_path_exists(path):
     # from
@@ -35,7 +24,7 @@ def locate(endOfFilename, subBin, rootD=os.curdir):
     pattern = '*' + endOfFilename
     matches = []
     if subBin is True:
-#         print(rootD)
+        #         print(rootD)
         for root, dirnames, filenames in os.walk(rootD):
             for filename in fnmatch.filter(filenames, pattern):
                 matches.append(os.path.join(root, filename))
