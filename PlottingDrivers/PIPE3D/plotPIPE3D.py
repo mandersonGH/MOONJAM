@@ -11,14 +11,14 @@ import matplotlib.pyplot as plt
 import copy
 import string
 
-import direcFuncs as dF
-import plottingTools as pT
-import plotFuncs as pF
+import Utilities.direcFuncs as dF
+import PlottingTools.plottingTools as pT
+import PlottingTools.plotFuncs as pF
 import GalaxyObject.fitsExtraction as fE
 from EmissionLine.EmissionLineSlice import EmissionLineSlice
 
-from Plotting.PlotterABC import PlotterABC
-from Plotting.PIPE3D.plotSFH import plotSFH
+from PlottingDrivers.PlotterABC import PlotterABC
+from PlottingDrivers.PIPE3D.plotSFH import plotSFH
 
 
 class plotter_PIPE3D(PlotterABC):
@@ -57,7 +57,7 @@ class plotter_PIPE3D(PlotterABC):
 
             dictPlotTitles_Index, dictPlotTitles_Error, dictPlotTitles_Pair = self.createDictionaries(
                 galaxy, NAXIS3, titleHdr, dataInd)
-            
+
             PIPE3D_Dir = EADir + '/MPL-4/PLOTS/PIPE3D/'
 
             if plotType == 'requested':

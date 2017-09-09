@@ -1,8 +1,8 @@
 import numpy as np
-
+import sys
 from astropy.io import fits
 
-from resources.EA_data import *
+from resources import EA_data
 
 
 def getNAXIS(hdu, dataInd):
@@ -43,7 +43,7 @@ def getCenters(hdu, plate_IFU, dataInd):
         gal_at_Cen = [np.round(NAXIS_vec[0] / 2), np.round(NAXIS_vec[1] / 2)]
 
     try:
-        hex_at_Cen = dictCenters[plate_IFU]
+        hex_at_Cen = EA_data.dictCenters[plate_IFU]
     except KeyError:
         hex_at_Cen = gal_at_Cen
 

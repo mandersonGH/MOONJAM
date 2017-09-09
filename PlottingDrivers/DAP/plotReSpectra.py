@@ -8,22 +8,27 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 
-import helperFuncs as hF
-import direcFuncs as dF
+import Utilities.helperFuncs as hF
+import Utilities.mathFuncs as mF
+import Utilities.direcFuncs as dF
 import GalaxyObject.fitsExtraction as fE
-import plottingTools as pT
-from plotFuncs import CAS_spectra
+import PlottingTools.plottingTools as pT
+from PlottingTools.plotFuncs import CAS_spectra
+
 
 def plotReSpectra(EADir, galaxy, DAPtype, plotType, dataInd, dataCube, waveVec):
-    nFP = dF.assure_path_exists(EADir + DAPtype + '/PLOTS/DAP/'+ galaxy.PLATEIFU +'/ReSpectra/')
+    nFP = dF.assure_path_exists(
+        EADir + DAPtype + '/PLOTS/DAP/' + galaxy.PLATEIFU + '/ReSpectra/')
     # unitsY = hdu[0].header['BUNIT']
     unitsX = 'Wavelength (Angstroms)'
     # unitsY = '$' + unitsY + '$'
     # unitsX = '$' + unitsX + '$'
 
-    unitsY = '$f_{\\lambda}$ ' + ' (' + '$10^{-17}$' + 'erg/s/cm' + '$^{2}$' + '/Ang)'
+    unitsY = '$f_{\\lambda}$ ' + \
+        ' (' + '$10^{-17}$' + 'erg/s/cm' + '$^{2}$' + '/Ang)'
 
-    hex_at_Cen, gal_at_Cen = fE.getCenters(galaxy.myHDU, galaxy.PLATEIFU, dataInd)
+    hex_at_Cen, gal_at_Cen = fE.getCenters(
+        galaxy.myHDU, galaxy.PLATEIFU, dataInd)
 
     refPnt = [hex_at_Cen[1], hex_at_Cen[0]]
 
@@ -43,8 +48,8 @@ def plotReSpectra(EADir, galaxy, DAPtype, plotType, dataInd, dataCube, waveVec):
 
 
 def normalizeSpectra(waveVec, ReSpectra, wavelength):
-    lowInd = hF.findIndex(waveVec, wavelength - 50)
-    highInd = hF.findIndex(waveVec, wavelength + 50)
+    lowInd = mF.findIndex(waveVec, wavelength - 50)
+    highInd = mF.findIndex(waveVec, wavelength + 50)
 
     normFactor = np.median(ReSpectra[lowInd:highInd])
 
@@ -57,10 +62,13 @@ def createWedgeSpectra(dataCube, radii, refPnt, Re, hdu, plate_IFU, dataInd, cen
     dictWedgeSpaxNum = {}
 
     hex_at_Cen, gal_at_Cen = fE.getCenters(hdu, plate_IFU, dataInd)
-    axisCoordMaj, mMaj, bMaj = pT.getAxisLineProperties(plate_IFU, 'major', center, gal_at_Cen, hex_at_Cen)
-    axisCoordMin, mMin, bMin = pT.getAxisLineProperties(plate_IFU, 'minor', center, gal_at_Cen, hex_at_Cen)
+    axisCoordMaj, mMaj, bMaj = pT.getAxisLineProperties(
+        plate_IFU, 'major', center, gal_at_Cen, hex_at_Cen)
+    axisCoordMin, mMin, bMin = pT.getAxisLineProperties(
+        plate_IFU, 'minor', center, gal_at_Cen, hex_at_Cen)
 
-    wedgeLabelMat = createWedgeLabelMat(dataCube[0].shape, radii, Re, refPnt, mMaj, bMaj, mMin, bMin)
+    wedgeLabelMat = createWedgeLabelMat(
+        dataCube[0].shape, radii, Re, refPnt, mMaj, bMaj, mMin, bMin)
 
     # plt.figure()
     # plt.imshow(wedgeLabelMat, origin='lower', interpolation='nearest')
@@ -72,7 +80,7 @@ def createWedgeSpectra(dataCube, radii, refPnt, Re, hdu, plate_IFU, dataInd, cen
         for x in range(wedgeLabelMat.shape[1]):
             for mod in range(1, 5):
                 if wedgeLabelMat[y, x] % 5 == mod:
-                    currDist = hF.calculateDistance(x, y, refPnt[0], refPnt[1])
+                    currDist = mF.calculateDistance(x, y, refPnt[0], refPnt[1])
                     for r in range(len(radii)):
                         if currDist <= radii[r] * Re:
                             index = mod + r * 5 - 1
@@ -80,7 +88,8 @@ def createWedgeSpectra(dataCube, radii, refPnt, Re, hdu, plate_IFU, dataInd, cen
                                 index -= 1
                             if index > 9:
                                 index -= 1
-                            ReSpectra[index] = ReSpectra[index] + dataCube[:, y, x]
+                            ReSpectra[index] = ReSpectra[index] + \
+                                dataCube[:, y, x]
 
     return ReSpectra, dictWedgeSpaxNum
 
@@ -90,7 +99,7 @@ def createWedgeLabelMat(shape, radii, Re, refPnt, mMaj, bMaj, mMin, bMin):
 
     for y in range(wedgeLabelMat.shape[0]):
         for x in range(wedgeLabelMat.shape[1]):
-            currDist = hF.calculateDistance(x, y, refPnt[0], refPnt[1])
+            currDist = mF.calculateDistance(x, y, refPnt[0], refPnt[1])
             # print(x, y, currDist)
             for r in reversed(range(len(radii))):
                 if currDist <= radii[r] * Re:
@@ -122,12 +131,13 @@ def createRadialSpectra(waveVec, dataCube, radii, refPnt, Re, normWavelength='')
         count = 0
         for i in range(dataCube.shape[1]):
             for j in range(dataCube.shape[2]):
-                if hF.calculateDistance(refPnt[0], refPnt[1], i, j) / Re <= radii[k]:
+                if mF.calculateDistance(refPnt[0], refPnt[1], i, j) / Re <= radii[k]:
                     count += 1
                     ReSpectra[k] = ReSpectra[k] + dataCube[:, i, j]
         dictRadiiSpaxNum[radii[k]] = count
         if normWavelength != '':
-            ReSpectra[k] = normalizeSpectra(waveVec, ReSpectra[k], normWavelength)
+            ReSpectra[k] = normalizeSpectra(
+                waveVec, ReSpectra[k], normWavelength)
     return ReSpectra, dictRadiiSpaxNum
 
 
@@ -146,8 +156,9 @@ def plotSideBySideSpectra(plate_IFU, radii, waveVec, ReSpectra, dictRadiiSpaxNum
         axesTemp = plt.subplot(2, 3, 4 + i)
         plt.plot(waveVec, ReSpectra[i])
         spaxNum = dictRadiiSpaxNum[radii[i]]
-        axesTemp.set_title('From 0 to ' + str(radii[i]) + '$R_e$ :: ' + str(spaxNum) + ' spaxel(s)', fontsize=fontsize)
-        highInd = hF.findIndex(waveVec, 9300)
+        axesTemp.set_title(
+            'From 0 to ' + str(radii[i]) + '$R_e$ :: ' + str(spaxNum) + ' spaxel(s)', fontsize=fontsize)
+        highInd = mF.findIndex(waveVec, 9300)
         axesTemp.set_ylim([0, max(ReSpectra[i][0:highInd])])
         axesTemp.set_xlim([min(waveVec), 9300])
 
@@ -159,7 +170,8 @@ def plotSideBySideSpectra(plate_IFU, radii, waveVec, ReSpectra, dictRadiiSpaxNum
     # fig.tight_layout()
     # plt.show()
     # print(jello)
-    plt.savefig(nFP + plate_IFU + '_' + extraLabel + 'SideBySideReSpectra.png', bbox_inches='tight')
+    plt.savefig(nFP + plate_IFU + '_' + extraLabel +
+                'SideBySideReSpectra.png', bbox_inches='tight')
     # print(jello)
     plt.close()
 
@@ -177,11 +189,12 @@ def plotStackedSpectra(plate_IFU, radii, waveVec, ReSpectra, dictRadiiSpaxNum, u
     axes2 = plt.subplot(1, 2, 2)
     axes2.set_title(plate_IFU, fontsize=fontsize)
     maxx = 0
-    highInd = hF.findIndex(waveVec, 9300)
+    highInd = mF.findIndex(waveVec, 9300)
     for i in range(len(radii)):
         plt.plot(waveVec, ReSpectra[i])
         spaxNum = dictRadiiSpaxNum[radii[i]]
-        legVec.append('R <= ' + str(radii[i]) + '$R_e$ ' + str(spaxNum) + ' spaxel(s)')
+        legVec.append('R <= ' + str(radii[i]) +
+                      '$R_e$ ' + str(spaxNum) + ' spaxel(s)')
         if max(ReSpectra[i][0:highInd]) > maxx:
             maxx = max(ReSpectra[i][0:highInd])
 
@@ -196,7 +209,8 @@ def plotStackedSpectra(plate_IFU, radii, waveVec, ReSpectra, dictRadiiSpaxNum, u
 
     fig.tight_layout()
     plt.show()
-    print(jello)
-    plt.savefig(nFP + plate_IFU + '_' + extraLabel + 'StackedReSpectra.png', bbox_inches='tight')
+    #print(jello)
+    plt.savefig(nFP + plate_IFU + '_' + extraLabel +
+                'StackedReSpectra.png', bbox_inches='tight')
     # print(jello)
     plt.close()

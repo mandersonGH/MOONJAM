@@ -7,10 +7,10 @@ import matplotlib.colors as mclr
 import plottingTools as pT
 from GalaxyObject import fitsExtraction as fE
 import dataCorrection as dC
-import helperFuncs as hF
-import drawOnPlots as dOP
+import Utilities.helperFuncs as hF
+import PlottingTools.drawOnPlots as dOP
 
-import CALIFAcolourmap as CALIFAcmap
+import Utilities.CALIFAcolourmap as CALIFAcmap
 
 from astropy.io.fits.verify import VerifyError, VerifyWarning
 

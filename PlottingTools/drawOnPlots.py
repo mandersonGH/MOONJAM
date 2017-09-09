@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import RegularPolygon
 from matplotlib.collections import PatchCollection
 
-from resources.EA_data import *
+from resources import EA_data
 import plottingTools as pT
 
 colorForLines = 'aqua'
@@ -36,7 +36,7 @@ def plotHexagon(axes, plate_IFU, scale=1):
     IFU = plate_IFU.split("-")[1]
     fiberNo = int(IFU[:IFU.find('0')])
 
-    size = float(hexSizeDict[fiberNo]) / scale
+    size = float(EA_data.hexSizeDict[fiberNo]) / scale
     center = [0, 0]
     x1, x2 = axes.get_xlim()
     y1, y2 = axes.get_ylim()

@@ -1,13 +1,14 @@
 import numpy as np
 from astropy.io import fits
 
-from resources.EA_data import *
-from helperFuncs import *
+from resources import EA_data
+import Utilities.helperFuncs as hF
+import Utilities.mathFuncs as mF
 from GalaxyObject.fitsExtraction import *
 
 
 def axisEndpoints(plate_IFU, Re, hex_at_Cen):
-    endPoints = dictMajMinAxis[plate_IFU]
+    endPoints = EA_data.dictMajMinAxis[plate_IFU]
 
     majX = [(float(endPoints[0][i][0] - hex_at_Cen[0]) / Re) for i in range(2)]
     majY = [(float(endPoints[0][i][1] - hex_at_Cen[1]) / Re) for i in range(2)]
@@ -105,7 +106,7 @@ def createDistanceMatrix(hdu, Re, dataInd):
 
     for i in range(0, NAXIS_vec[0]):
         for j in range(0, NAXIS_vec[1]):
-            disMat[i, j] = calculateDistance(0, 0, (x2 - i), (y2 - j))
+            disMat[i, j] = mF.calculateDistance(0, 0, (x2 - i), (y2 - j))
             disMat[i, j] = disMat[i, j] / Re
 
     return disMat
@@ -123,7 +124,7 @@ def getSPAXD_vec(hdu):
 def visualImageCropping(plate_IFU, shape):
     IFU = plate_IFU.split("-")[1]
     fiberNo = int(IFU[:IFU.find('0')])
-    cropSize = dictScaling[fiberNo]
+    cropSize = EA_data.dictScaling[fiberNo]
     scaleVec = [0, 0, 0, 0]
     for i in range(len(shape)):
         scaleVec[i * 2] = cropSize
@@ -141,7 +142,7 @@ def centerVec(vec):
 
 
 def axisSkewGal(axes, gal_at_Cen, hex_at_Cen, Re, extentVec):
-    hexGalShift = calcHexGalShift(hex_at_Cen, gal_at_Cen, Re)
+    hexGalShift = hF.calcHexGalShift(hex_at_Cen, gal_at_Cen, Re)
     # print(hexGalShift)
     badXlim = axes.get_xlim()
     badYlim = axes.get_ylim()
@@ -164,7 +165,8 @@ def major_minor_axis(plate_IFU, whichAxis, hex_at_Cen, gal_at_Cen, center='GAL')
     elif center == 'HEX':
         refPnt = hex_at_Cen
 
-    axisCoord, m, b = getAxisLineProperties(plate_IFU, whichAxis, center, gal_at_Cen, hex_at_Cen)
+    axisCoord, m, b = getAxisLineProperties(
+        plate_IFU, whichAxis, center, gal_at_Cen, hex_at_Cen)
 
     ## whether x or y has more values in the range ####
     if abs(m) <= 1:
@@ -194,7 +196,7 @@ def major_minor_axis(plate_IFU, whichAxis, hex_at_Cen, gal_at_Cen, center='GAL')
     sign = -1
     for i in indexes:
         dist = sign * \
-            np.abs(calculateDistance(refPnt[0], refPnt[1], i[0], i[1]))
+            np.abs(mF.calculateDistance(refPnt[0], refPnt[1], i[0], i[1]))
 
         # print(str(i) + " " + str(refPnt) + " " + str(dist))
 
@@ -212,7 +214,7 @@ def getAxisLineProperties(plate_IFU, whichAxis, center, gal_at_Cen, hex_at_Cen):
     elif whichAxis == 'minor':
         ind = 1
 
-    axisCoord = dictMajMinAxis[plate_IFU][ind]
+    axisCoord = EA_data.dictMajMinAxis[plate_IFU][ind]
     # print("hey")
     # print(axisCoord)
     axisCoord2 = [[[0, 0], [0, 0]], [[0, 0], [0, 0]]]
@@ -226,6 +228,6 @@ def getAxisLineProperties(plate_IFU, whichAxis, center, gal_at_Cen, hex_at_Cen):
         axisCoord2 = axisCoord
     # print(axisCoord2)
 
-    m, b = createLineEquation(axisCoord2)
+    m, b = mF.createLineEquation(axisCoord2)
 
     return axisCoord2, m, b

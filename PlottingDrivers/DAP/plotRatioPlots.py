@@ -9,10 +9,11 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib.colors as mclr
 
-import plottingTools as pT
-import plotFuncs as pF
-import helperFuncs as hF
-import drawOnPlots as dOP
+import PlottingTools.plottingTools as pT
+import PlottingTools.plotFuncs as pF
+import Utilities.helperFuncs as hF
+import Utilities.mathFuncs as mF
+import PlottingTools.drawOnPlots as dOP
 
 from EmissionLine.EmissionLineSlice import EmissionLineSlice
 np.seterr(divide='ignore', invalid='ignore')
@@ -341,7 +342,7 @@ def ratioAxes(plotType, emLineFancy, x, y, d, labels, axes):
                       color='orange', fontsize=annotationSize, weight='bold')
 
         y_lastAnno = ymin + (ymax - ymin) * 0.1
-        x_lastAnno = x1[hF.findIndex(y1, y_lastAnno)] + 0.05
+        x_lastAnno = x1[mF.findIndex(y1, y_lastAnno)] + 0.05
         axes.annotate('Inter', xy=(x_lastAnno, y_lastAnno),
                       color='yellowgreen', fontsize=annotationSize, weight='bold')
     elif plotType == 'WHAN':

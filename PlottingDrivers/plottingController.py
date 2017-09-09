@@ -3,8 +3,8 @@ Created on Sep 8, 2017
 
 @author: Mande
 '''
-from Plotting.DAP.plotDAP import plotter_DAP
-from Plotting.PIPE3D.plotPIPE3D import plotter_PIPE3D
+from PlottingDrivers.DAP.plotDAP import plotter_DAP
+from PlottingDrivers.PIPE3D.plotPIPE3D import plotter_PIPE3D
 import os
 
 
