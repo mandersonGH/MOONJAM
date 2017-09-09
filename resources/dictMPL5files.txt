@@ -1,0 +1,5 @@
+{'bpt': 'MAPS-SPX-GAU-MILESHC.fits',
+'whan': 'MAPS-SPX-GAU-MILESHC.fits',
+'emlines_gflux': 'MAPS-SPX-GAU-MILESHC.fits',
+'emlines_ew': 'MAPS-SPX-GAU-MILESHC.fits',
+'respectra': 'LOGCUBE-SPX-GAU-MILESHC.fits'}

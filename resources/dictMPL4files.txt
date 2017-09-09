@@ -1,0 +1,5 @@
+{'bpt': 'default.fits',
+'whan': 'default.fits',
+'emlines_gflux': 'default.fits',
+'emlines_ew': 'default.fits',
+'respectra': 'LOGCUBE.fits'}

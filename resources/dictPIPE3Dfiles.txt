@@ -1,0 +1,8 @@
+{'sfh': 'p_e.rad_SFH_lum_Mass.fits',
+'_____': 'p_e.Sigma_Mass.fits',
+'requested': '.cube.fits',
+'lum_fracs': 'SFH.cube.fits',
+'stellpops': 'SSP.cube.fits',
+'flux_elines': '.cube.fits',
+'indices.cs': '.cube.fits',
+'elines': 'ELINES.cube.fits'}
