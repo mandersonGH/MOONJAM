@@ -8,6 +8,7 @@ import numpy as np
 from astropy.io.fits.verify import VerifyError, VerifyWarning
 import matplotlib.pyplot as plt
 
+import copy
 import string
 
 import direcFuncs as dF
@@ -46,6 +47,7 @@ class plotter_PIPE3D(PlotterABC):
                     return
 
             galaxy.setCenterType('HEX')
+            galaxy.pullRe(EADir, 'MPL-4')
 
             NAXIS3 = fE.getNAXIS3(galaxy.myHDU)
 
@@ -54,7 +56,9 @@ class plotter_PIPE3D(PlotterABC):
             dataInd = 0
 
             dictPlotTitles_Index, dictPlotTitles_Error, dictPlotTitles_Pair = self.createDictionaries(
-                galaxy.myHDU, NAXIS3, titleHdr, dataInd, galaxy.myFilename)
+                galaxy, NAXIS3, titleHdr, dataInd)
+            
+            PIPE3D_Dir = EADir + '/MPL-4/PLOTS/PIPE3D/'
 
             if plotType == 'requested':
                 requestedWithin = [['velocity', 'stellar population'], [
@@ -64,13 +68,13 @@ class plotter_PIPE3D(PlotterABC):
                     dictPlotTitles_Index, dictPlotTitles_Error, dictPlotTitles_Pair, requestedWithin)
 
                 nFP = dF.assure_path_exists(
-                    EADir + '/PLOTS/PIPE3D/' + plotType + '/' + galaxy.PLATEIFU + '/')
+                    PIPE3D_Dir + plotType + '/' + galaxy.PLATEIFU + '/')
                 nFPraw = ''
             else:
                 nFP = dF.assure_path_exists(
-                    EADir + '/PLOTS/PIPE3D/' + galaxy.PLATEIFU + '/' + plotType + '/')
+                    PIPE3D_Dir + galaxy.PLATEIFU + '/' + plotType + '/')
                 nFPraw = dF.assure_path_exists(
-                    EADir + '/PLOTS/PIPE3D/' + galaxy.PLATEIFU + '/' + plotType + '/RAW/')
+                    PIPE3D_Dir + galaxy.PLATEIFU + '/' + plotType + '/RAW/')
 
             if not bool(dictPlotTitles_Index):
                 print("No plots of type (" + plotType +
@@ -93,16 +97,15 @@ class plotter_PIPE3D(PlotterABC):
                     axes = plt.gca()
                     slice = self.createSlice(dataMat, maskMat, units)
                     pF.spatiallyResolvedPlot(galaxy,
-                                             axes,
                                              plotType,
                                              newFileName,
                                              dataInd,
-                                             gal_at_Cen,
-                                             hex_at_Cen,
                                              slice,
-                                             units,
+                                             hex_at_Cen,
+                                             gal_at_Cen,
                                              None,
-                                             None)
+                                             None,
+                                             axes)
                     # fig.tight_layout()
                     # plt.show()
                     # print(jello)
@@ -120,16 +123,15 @@ class plotter_PIPE3D(PlotterABC):
                     errMat = galaxy.myHDU[dataInd].data[dictPlotTitles_Index[keyOfError]]
                     slice = self.createSlice(dataMat, maskMat, units)
                     slice.setError(errMat)
-                    pF.plotQuadPlot(galaxy,
-                                    dataInd,
-                                    plotTitle,
+                    pF.plotQuadPlot(EADir,
+                                    galaxy,
                                     nFP,
-                                    newFileName,
-                                    EADir,
+                                    dataInd,
                                     slice,
-                                    units,
-                                    vmin=None,
-                                    vmax=None)
+                                    newFileName,
+                                    plotTitle,
+                                    vmax=None,
+                                    vmin=None)
 
             if bool(dictPlotTitles_Pair):
                 for key in dictPlotTitles_Pair.keys():
@@ -151,9 +153,8 @@ class plotter_PIPE3D(PlotterABC):
                                            slice1,
                                            slice2,
                                            hex_at_Cen,
-                                           gal_at_Cen,
-                                           units1,
-                                           units2)
+                                           gal_at_Cen
+                                           )
 
     def prepData(self, titleDict, key, galaxy, dataInd, NAXIS3):
         if NAXIS3 == 0:
@@ -200,7 +201,8 @@ class plotter_PIPE3D(PlotterABC):
         return dataMat, maskMat, newFileName, plotTitle, units
 
     def removeNonRequested(self, dictPlotTitles_Index, dictPlotTitles_Error, dictPlotTitles_Pair, requestedWithin):
-        for key in dictPlotTitles_Index.keys():
+        dictKeys = copy.copy(list(dictPlotTitles_Index.keys()))
+        for key in dictKeys:
             flag = False
             for withinTextVec in requestedWithin:
                 currFlag = True

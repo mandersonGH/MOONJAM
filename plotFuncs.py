@@ -17,7 +17,7 @@ from astropy.io.fits.verify import VerifyError, VerifyWarning
 fontsize = 30
 
 
-def plotAxisCrossSections(galaxy, slice, units, hex_at_Cen, gal_at_Cen, axes2):
+def plotAxisCrossSections(galaxy, slice, hex_at_Cen, gal_at_Cen, axes2):
     try:
         dOP.addCrossHairs(axes2, galaxy.PLATEIFU, galaxy.Re, hex_at_Cen)
     except KeyError:
@@ -25,16 +25,16 @@ def plotAxisCrossSections(galaxy, slice, units, hex_at_Cen, gal_at_Cen, axes2):
     dOP.addReCircles(axes2)
     try:
         axes3 = plt.subplot(2, 2, 3)
-        plotMajMinAxis(galaxy, slice, units, hex_at_Cen,
+        plotMajMinAxis(galaxy, slice, hex_at_Cen,
                        gal_at_Cen, axes3, 'major')
         axes4 = plt.subplot(2, 2, 4)
-        plotMajMinAxis(galaxy, slice, units, hex_at_Cen,
+        plotMajMinAxis(galaxy, slice, hex_at_Cen,
                        gal_at_Cen, axes4, 'minor')
     except KeyError:
         print("Center and axis unknown for this galaxy")
 
 
-def plotQuadPlot(EADir, galaxy, nFP, dataInd, slice, units, newFileName, plotTitle, vmax=None, vmin=None):
+def plotQuadPlot(EADir, galaxy, nFP, dataInd, slice, newFileName, plotTitle, vmax=None, vmin=None):
 
     hex_at_Cen, gal_at_Cen = fE.getCenters(
         galaxy.myHDU, galaxy.PLATEIFU, dataInd)
@@ -54,13 +54,12 @@ def plotQuadPlot(EADir, galaxy, nFP, dataInd, slice, units, newFileName, plotTit
     # dOP.plotHexagon(axes1, plate_IFU)
 
     axes2 = plt.subplot(2, 2, 2)
-    spatiallyResolvedPlot(galaxy, "", newFileName, dataInd, units,
+    spatiallyResolvedPlot(galaxy, "", newFileName, dataInd,
                           slice, hex_at_Cen, gal_at_Cen, vmax, vmin, axes2)
 
     simple = 'No'
     if simple == 'No':
-        plotAxisCrossSections(galaxy, slice, units,
-                              hex_at_Cen, gal_at_Cen, axes2)
+        plotAxisCrossSections(galaxy, slice, hex_at_Cen, gal_at_Cen, axes2)
 
     # fig.tight_layout()
     # plt.show()
@@ -89,16 +88,22 @@ def pickColorMap(plotType):
     return cmap
 
 
-def spatiallyResolvedPlot(galaxy, plotType, newFileName, dataInd, units, slice, hex_at_Cen, gal_at_Cen, vmax, vmin, axes):
+def spatiallyResolvedPlot(galaxy, plotType, newFileName, dataInd, slice, hex_at_Cen, gal_at_Cen, vmax, vmin, axes):
 
     axes.set_title('Spatially Resolved', fontsize=fontsize +
                    5, weight='bold', y=1.01)
 
-    extentVec = pT.createExtentVec(
-        galaxy.PLATEIFU, galaxy.myHDU, dataInd, galaxy.Re, center=galaxy.myCenterType)
+    try:
+        extentVec = pT.createExtentVec(
+            galaxy.PLATEIFU, galaxy.myHDU, dataInd, galaxy.Re, center=galaxy.myCenterType)
 
-    xticks, yticks = pT.getTicks(
-        gal_at_Cen, hex_at_Cen, extentVec, galaxy.Re, center=galaxy.myCenterType)
+        xticks, yticks = pT.getTicks(
+            gal_at_Cen, hex_at_Cen, extentVec, galaxy.Re, center=galaxy.myCenterType)
+
+        plt.xticks(xticks, fontsize=fontsize)
+        plt.yticks(yticks, fontsize=fontsize)
+    except AttributeError:
+        print("No Re found")
 
     masked_image = np.ma.array(slice.myData, mask=slice.myMask)
 
@@ -106,8 +111,6 @@ def spatiallyResolvedPlot(galaxy, plotType, newFileName, dataInd, units, slice, 
 
     plt.xlabel("$R/R_e$", fontsize=fontsize)
     plt.ylabel("$R/R_e$", fontsize=fontsize)
-    plt.xticks(xticks, fontsize=fontsize)
-    plt.yticks(yticks, fontsize=fontsize)
 
     # galaxy axis business
 
@@ -138,7 +141,7 @@ def spatiallyResolvedPlot(galaxy, plotType, newFileName, dataInd, units, slice, 
             cbar = plt.colorbar()
             # cbar.set_ticks(np.round(np.linspace(np.log10(vmin), np.log10(vmax), 6), 2))
             cbar.ax.tick_params(labelsize=fontsize)
-            cbar.set_label(units, fontsize=fontsize)
+            cbar.set_label(slice.myUnits, fontsize=fontsize)
         except ValueError:
             print("Bad Colormap Value")
         except KeyError:
@@ -153,7 +156,7 @@ def spatiallyResolvedPlot(galaxy, plotType, newFileName, dataInd, units, slice, 
     dOP.plotHexagon(axes, galaxy.PLATEIFU, scale=galaxy.Re * 0.5)
 
 
-def plotComparisonPlots(galaxy, dataInd, nFP, EADir, plotType, newFileName1, newFileName2, slice1, slice2, hex_at_Cen, gal_at_Cen, units1, units2):
+def plotComparisonPlots(galaxy, dataInd, nFP, EADir, plotType, newFileName1, newFileName2, slice1, slice2, hex_at_Cen, gal_at_Cen):
     fig = plt.figure(figsize=(22, 6))
     axes1 = plt.subplot(1, 3, 1)
     opticalImage(axes1, galaxy, dataInd, EADir)
@@ -163,7 +166,6 @@ def plotComparisonPlots(galaxy, dataInd, nFP, EADir, plotType, newFileName1, new
                           plotType,
                           newFileName1,
                           dataInd,
-                          units1,
                           slice1,
                           hex_at_Cen,
                           gal_at_Cen,
@@ -178,7 +180,6 @@ def plotComparisonPlots(galaxy, dataInd, nFP, EADir, plotType, newFileName1, new
                           plotType,
                           newFileName2,
                           dataInd,
-                          units2,
                           slice2,
                           hex_at_Cen,
                           gal_at_Cen,
@@ -236,7 +237,7 @@ def opticalImage(EADir, galaxy, dataInd, axes):
     plt.yticks(fontsize=fontsize)
 
 
-def plotMajMinAxis(galaxy, slice, units, hex_at_Cen, gal_at_Cen, axes, axisType):
+def plotMajMinAxis(galaxy, slice, hex_at_Cen, gal_at_Cen, axes, axisType):
     distances, indexes = pT.major_minor_axis(
         galaxy.PLATEIFU, axisType, hex_at_Cen, gal_at_Cen, center=galaxy.myCenterType)
     ReMax = 3.6
@@ -244,7 +245,7 @@ def plotMajMinAxis(galaxy, slice, units, hex_at_Cen, gal_at_Cen, axes, axisType)
     axes.set_title('Along ' + axisType.title() + ' Axis',
                    fontsize=fontsize, fontweight='bold', y=1.01)
     axes.set_xlabel('$R/R_e$', fontsize=fontsize)
-    axes.set_ylabel(units, fontsize=fontsize)
+    axes.set_ylabel(slice.myUnits, fontsize=fontsize)
     plt.xticks(fontsize=fontsize)
     plt.yticks(fontsize=fontsize)
 

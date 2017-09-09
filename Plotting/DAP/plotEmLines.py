@@ -79,8 +79,8 @@ def plotEmLines(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP, dataInd):
                         nFP,
                         dataInd,
                         slice,
-                        units,
                         newFileName,
                         plotTitle,
                         vmax=vmax,
                         vmin=vmin)
+        
