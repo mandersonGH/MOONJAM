@@ -12,10 +12,13 @@ from EmissionLine import EmissionLineSlice
 
 
 def pickBoundsForColorBar(slice):
-    if np.nanmin(slice.myData[slice.myMask == 0]) < 0:
+    try:
+        if np.nanmin(slice.myData[slice.myMask == 0]) < 0:
+            vmin = 0
+        else:
+            vmin = np.nanmin(slice.myData[slice.myMask == 0])
+    except ValueError:
         vmin = 0
-    else:
-        vmin = np.nanmin(slice.myData[slice.myMask == 0])
     devs = 3
     vmax = dC.pickVMAX(slice.myData[slice.myMask == 0], devs)
     if vmax > 10:
@@ -42,6 +45,11 @@ def pickBoundsForColorBar(slice):
 def plotEmLines(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP, dataInd):
 
     units = '$' + galaxy.myHDU[dataInd].header['BUNIT'] + '$'
+#     galaxy.myHDU.info()
+#     for j in galaxy.myHDU[dataInd].header.keys():
+#         print(str(j) + "  ::   " + str(galaxy.myHDU[dataInd].header[j]))
+#     #galaxy.printInfo()
+    
     # cycle through 11 chosen wavelengths
     for j in emLineInd.keys():
         # print(lineType + ": " + j)
@@ -58,13 +66,14 @@ def plotEmLines(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP, dataInd):
         slice.setData(galaxy.myDataCube[emLineInd[j]])
         slice.setError(galaxy.myErrorCube[emLineInd[j]])
         slice.setMask(galaxy.myMaskCube[emLineInd[j]])
+        slice.setUnits(units)
 
         ############ data Correction #############
 
         # dC.printDataInfo(dataMat)
 
         vmax, vmin = pickBoundsForColorBar(slice)
-
+#         print(jello)
         pF.plotQuadPlot(EADir,
                         galaxy,
                         nFP,

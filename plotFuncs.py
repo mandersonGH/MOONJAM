@@ -59,15 +59,15 @@ def plotQuadPlot(EADir, galaxy, nFP, dataInd, slice, units, newFileName, plotTit
 
     simple = 'No'
     if simple == 'No':
-        plotAxisCrossSections(galaxy, slice, units, hex_at_Cen, gal_at_Cen, axes2)
+        plotAxisCrossSections(galaxy, slice, units,
+                              hex_at_Cen, gal_at_Cen, axes2)
 
     # fig.tight_layout()
-    plt.show()
-    3print(jello)
+    # plt.show()
+    # print(jello)
     plt.savefig(nFP + newFileName + '.png')
     # print(jello)
     plt.close()
-
 
 
 def selectBoundsForColorMap(slice, vmax, vmin):
@@ -87,6 +87,7 @@ def pickColorMap(plotType):
     # cmap = CALIFAcmap.get_califa_intensity_cmap()
     # cmap = cm.get_cmap('coolwarm', 3)
     return cmap
+
 
 def spatiallyResolvedPlot(galaxy, plotType, newFileName, dataInd, units, slice, hex_at_Cen, gal_at_Cen, vmax, vmin, axes):
 
@@ -121,7 +122,7 @@ def spatiallyResolvedPlot(galaxy, plotType, newFileName, dataInd, units, slice, 
                vmin=vmin, vmax=vmax, cmap=cmap,
                extent=extentVec, aspect='auto')
 
-    axes.set_axis_bgcolor('grey')
+    axes.set_facecolor('grey')
 
     if plotType == 'WHAN' or plotType.startswith('BPT'):
         cbar = plt.colorbar()

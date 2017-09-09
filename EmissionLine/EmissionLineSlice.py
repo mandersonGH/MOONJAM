@@ -21,3 +21,6 @@ class EmissionLineSlice(object):
 
     def setError(self, error):
         self.myError = error
+
+    def setUnits(self, units):
+        self.myUnits = units

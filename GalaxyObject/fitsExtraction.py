@@ -60,7 +60,6 @@ def getRe(EADir, DAPtype, plate_IFU):
     drpallFile = EADir + DAPtype + '/DATA/' + drpallFilename
 
     try:
-        print(drpallFile)
         drpall = fits.open(drpallFile)
 
         for i in range(1, len(drpall[1].data[0]) + 1):
