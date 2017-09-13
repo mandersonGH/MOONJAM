@@ -33,10 +33,6 @@ class Controller:
         # EADirectory - where all plots and data are saved
         # opts - the arguments following the run command that dictate what
         # plots the user wants to produce
-        print("")
-        print('The program will search this directory for .fits and .fits.gz files:')
-        print('     ' + EADirectory)
-        print("")
         print()
         timer = Stopwatch()
         timer.start()
@@ -70,24 +66,29 @@ class Controller:
             print("no user interface built")
 
         opts = [opt.lower() for opt in opts]
-        return opts, os.path.normpath(EADirectory)
+        return opts, os.path.abspath(EADirectory)
 
     def requiredFileSearch(self, opts, EADirectory):
         fileDict = defaultdict(list)
+        print("")
+        print('The program will search this directory for .fits and .fits.gz files:')
         if 'mpl4' in opts:
+            print('     ' + os.path.join(EADirectory, "MPL-4", "DATA", "DAP"))
             fileDict.update(self.makeFilePlotDict(
                 opts, os.path.join(EADirectory, "MPL-4", "DATA", "DAP"), self.dictMPL4files))
             if 'pipe3d' in opts:
+                print('     ' + os.path.join(EADirectory, "MPL-4", "DATA", "PIPE3D"))
                 fileDict.update(self.makeFilePlotDict(
                     opts, os.path.join(EADirectory, "MPL-4", "DATA", "PIPE3D"), self.dictPIPE3Dfiles))
         if 'mpl5' in opts:
+            print('     ' + os.path.join(EADirectory, "MPL-5", "DATA", "DAP"))
             fileDict.update(self.makeFilePlotDict(
                 opts, os.path.join(EADirectory, "MPL-5", "DATA", "DAP"), self.dictMPL5files))
             # if 'pipe3d' in opts:
             #    fileDict.update(self.makeFilePlotDict(
             # opts, EADirectory + "MPL-5\\DATA\\PIPE3D\\",
             # self.dictPIPE3Dfiles))
-
+        print("")
         return fileDict
 
     def makeFilePlotDict(self, opts, EADirectory, dictFileTypes):
