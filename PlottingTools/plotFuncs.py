@@ -1,4 +1,5 @@
 import numpy as np
+import os
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import matplotlib.cm as cm
@@ -64,7 +65,7 @@ def plotQuadPlot(EADir, galaxy, nFP, dataInd, slice, newFileName, plotTitle, vma
     # fig.tight_layout()
     # plt.show()
     # print(jello)
-    plt.savefig(nFP + newFileName + '.png')
+    plt.savefig(os.path.join(nFP, newFileName + '.png'))
     # print(jello)
     plt.close()
 
@@ -194,8 +195,8 @@ def plotComparisonPlots(galaxy, dataInd, nFP, EADir, plotType, newFileName1, new
 
     # plt.show()
     # print(jello)
-    plt.savefig(nFP + 'Comparison of ' + newFileName +
-                '.png', bbox_inches='tight')
+    plt.savefig(os.path.join(nFP, 'Comparison of ' + newFileName +
+                '.png'), bbox_inches='tight')
     plt.close()
 
 
@@ -204,16 +205,16 @@ def opticalImage(EADir, galaxy, dataInd, axes):
     # extentVec = pT.centerVec(extentVec)
     imgType = ''
     try:
-        visualImage = mpimg.imread(
-            EADir + '/CAS/' + galaxy.PLATEIFU + '/Visual.png')
+        visualImage = mpimg.imread(os.path.join(
+            EADir, "CAS", galaxy.PLATEIFU, 'Visual.png'))
         imgType = 'png'
     except FileNotFoundError:
         try:
-            visualImage = mpimg.imread(
-                EADir + '/CAS/' + galaxy.PLATEIFU + '/Optical.jpeg')
+            visualImage = mpimg.imread(os.path.join(
+                EADir, "CAS", galaxy.PLATEIFU, 'Optical.png'))
             imgType = 'jpeg'
         except FileNotFoundError:
-            visualImage = mpimg.imread(EADir + '/CAS/No Image Found.png')
+            visualImage = mpimg.imread(os.path.join(EADir,"CAS", "No Image Found.png"))
     # print(visualImage.shape)
     if imgType == 'png':
         scaleVec = pT.visualImageCropping(
@@ -276,7 +277,7 @@ def plotMajMinAxis(galaxy, slice, hex_at_Cen, gal_at_Cen, axes, axisType):
 
 def CAS_spectra(axes, EADir, plate_IFU):
     axes.set_title('Spectra from CAS')
-    visualImage = mpimg.imread(
-        EADir + '/CAS/' + plate_IFU + '/' + plate_IFU + '.gif')
+    visualImage = mpimg.imread(os.path.join(
+        EADir, "CAS", plate_IFU, plate_IFU + '.gif'))
     plt.imshow(visualImage)
     plt.axis('off')

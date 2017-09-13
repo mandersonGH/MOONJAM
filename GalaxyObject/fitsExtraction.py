@@ -1,5 +1,5 @@
 import numpy as np
-import sys
+import os
 from astropy.io import fits
 
 from resources import EA_data
@@ -57,7 +57,7 @@ def getRe(EADir, DAPtype, plate_IFU):
     elif DAPtype == "MPL-5":
         drpallFilename = 'drpall-v2_0_1.fits'
 
-    drpallFile = EADir + DAPtype + '/DATA/' + drpallFilename
+    drpallFile = os.path.join(EADir, DAPtype, "DATA", drpallFilename)
 
     try:
         drpall = fits.open(drpallFile)

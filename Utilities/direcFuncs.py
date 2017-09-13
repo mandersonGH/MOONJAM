@@ -23,7 +23,6 @@ def assure_path_exists(path):
 def locate(endOfFilename, subBin, rootD=os.curdir):
     pattern = '*' + endOfFilename
     matches = []
-    print(rootD)
     if subBin is True:
         #         print(rootD)
         for root, dirnames, filenames in os.walk(rootD):

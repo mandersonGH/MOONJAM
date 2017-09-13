@@ -15,12 +15,15 @@ import os
 
 class Controller:
 
-    resourceFolder = os.path.abspath(
-        os.path.join(__file__, "../..")) + "/resources/"
+    resourceFolder = os.path.join(os.path.abspath(
+        os.path.join(__file__, "..", "..")), "resources")
 
-    dictMPL4files = eval(open(resourceFolder + "dictMPL4files.txt").read())
-    dictMPL5files = eval(open(resourceFolder + "dictMPL5files.txt").read())
-    dictPIPE3Dfiles = eval(open(resourceFolder + "dictPIPE3Dfiles.txt").read())
+    dictMPL4files = eval(
+        open(os.path.join(resourceFolder, "dictMPL4files.txt")).read())
+    dictMPL5files = eval(
+        open(os.path.join(resourceFolder, "dictMPL5files.txt")).read())
+    dictPIPE3Dfiles = eval(
+        open(os.path.join(resourceFolder, "dictPIPE3Dfiles.txt")).read())
 
     def __init__(self, args):
         self.inputs = args
@@ -30,13 +33,28 @@ class Controller:
         # EADirectory - where all plots and data are saved
         # opts - the arguments following the run command that dictate what
         # plots the user wants to produce
-        print(EADirectory)
+        print("")
+        print('The program will search this directory for .fits and .fits.gz files:')
+        print('     ' + EADirectory)
+        print("")
+        print()
         timer = Stopwatch()
         timer.start()
         fileDict = self.requiredFileSearch(opts, EADirectory)
-        self.makePLOTS(fileDict, opts, EADirectory)
-        timer.stop()
-        timer.reportDuration()
+        if not fileDict:
+            print("")
+            print(
+                r"No files were found in the directory supplied. The program will now close. Avoiding ending the directory with the character '\' and put the entire directory in quotes if there are any spaces in the path")
+            print("")
+            timer.stop()
+        else:
+            print("")
+            print('The program found this many .fits and .fits.gz files:  ' +
+                  str(len(fileDict.items())))
+            print("")
+            self.makePLOTS(fileDict, opts, EADirectory)
+            timer.stop()
+            timer.reportDuration()
 
     def obtainUserOptsInput(self):
         opts = []
@@ -52,19 +70,19 @@ class Controller:
             print("no user interface built")
 
         opts = [opt.lower() for opt in opts]
-        return opts, EADirectory
+        return opts, os.path.normpath(EADirectory)
 
     def requiredFileSearch(self, opts, EADirectory):
         fileDict = defaultdict(list)
         if 'mpl4' in opts:
             fileDict.update(self.makeFilePlotDict(
-                opts, EADirectory + "MPL-4\\DATA\\DAP\\", self.dictMPL4files))
+                opts, os.path.join(EADirectory, "MPL-4", "DATA", "DAP"), self.dictMPL4files))
             if 'pipe3d' in opts:
                 fileDict.update(self.makeFilePlotDict(
-                    opts, EADirectory + "MPL-4\\DATA\\PIPE3D\\", self.dictPIPE3Dfiles))
+                    opts, os.path.join(EADirectory, "MPL-4", "DATA", "PIPE3D"), self.dictPIPE3Dfiles))
         if 'mpl5' in opts:
             fileDict.update(self.makeFilePlotDict(
-                opts, EADirectory + "MPL-5\\DATA\\DAP\\", self.dictMPL5files))
+                opts, os.path.join(EADirectory, "MPL-5", "DATA", "DAP"), self.dictMPL5files))
             # if 'pipe3d' in opts:
             #    fileDict.update(self.makeFilePlotDict(
             # opts, EADirectory + "MPL-5\\DATA\\PIPE3D\\",

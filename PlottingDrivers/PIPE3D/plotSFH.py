@@ -4,6 +4,7 @@ Created on Sep 8, 2017
 @author: Mande
 '''
 
+import os
 import Utilities.direcFuncs as dF
 import PlottingTools.plottingTools as pT
 from astropy.io import fits
@@ -53,7 +54,7 @@ times = [1.00E+06,
 
 
 def plotSFH(EADir, galaxy):
-    nFP = dF.assure_path_exists(EADir + '/MPL-4/PLOTS/PIPE3D/SFH/')
+    nFP = dF.assure_path_exists(os.path.join(EADir, "MPL-4", "PLOTS", "PIPE3D", "SFH"))
 
     dCube = galaxy.myHDU[0].data
 
@@ -103,4 +104,4 @@ def plotSFH(EADir, galaxy):
                        '$M_{sun}/pc^2$', fontsize=8)
             plt.ylim([maxRe, 0])
 
-    plt.savefig(nFP + galaxy.myFilename + '.png')
+    plt.savefig(os.path.join(nFP, galaxy.myFilename + '.png'))
