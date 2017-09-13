@@ -17,7 +17,7 @@ from PlottingTools.plotFuncs import CAS_spectra
 
 
 def plotReSpectra(EADir, galaxy, DAPtype, plotType, dataInd, dataCube, waveVec):
-    nFP = dF.assure_path_exists(os.join.path(
+    nFP = dF.assure_path_exists(os.path.join(
         EADir, DAPtype, 'PLOTS', 'DAP', galaxy.PLATEIFU, 'ReSpectra'))
     # unitsY = hdu[0].header['BUNIT']
     unitsX = 'Wavelength (Angstroms)'
