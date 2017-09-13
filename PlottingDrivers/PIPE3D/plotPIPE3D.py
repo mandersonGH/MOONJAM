@@ -4,6 +4,7 @@ Created on Sep 8, 2017
 @author: Mande
 '''
 import numpy as np
+import os
 
 from astropy.io.fits.verify import VerifyError, VerifyWarning
 import matplotlib.pyplot as plt
@@ -58,7 +59,7 @@ class plotter_PIPE3D(PlotterABC):
             dictPlotTitles_Index, dictPlotTitles_Error, dictPlotTitles_Pair = self.createDictionaries(
                 galaxy, NAXIS3, titleHdr, dataInd)
 
-            PIPE3D_Dir = EADir + '/MPL-4/PLOTS/PIPE3D/'
+            PIPE3D_Dir = os.path.join(EADir, "MPL-4", "PLOTS", "PIPE3D")
 
             if plotType == 'requested':
                 requestedWithin = [['velocity', 'stellar population'], [
@@ -67,14 +68,14 @@ class plotter_PIPE3D(PlotterABC):
                 dictPlotTitles_Index, dictPlotTitles_Error, dictPlotTitles_Pair = self.removeNonRequested(
                     dictPlotTitles_Index, dictPlotTitles_Error, dictPlotTitles_Pair, requestedWithin)
 
-                nFP = dF.assure_path_exists(
-                    PIPE3D_Dir + plotType + '/' + galaxy.PLATEIFU + '/')
+                nFP = dF.assure_path_exists(os.path.join(
+                    PIPE3D_Dir, plotType, galaxy.PLATEIFU))
                 nFPraw = ''
             else:
-                nFP = dF.assure_path_exists(
-                    PIPE3D_Dir + galaxy.PLATEIFU + '/' + plotType + '/')
-                nFPraw = dF.assure_path_exists(
-                    PIPE3D_Dir + galaxy.PLATEIFU + '/' + plotType + '/RAW/')
+                nFP = dF.assure_path_exists(os.path.join(
+                    PIPE3D_Dir, galaxy.PLATEIFU, plotType))
+                nFPraw = dF.assure_path_exists(os.path.join(
+                    PIPE3D_Dir, galaxy.PLATEIFU, plotType, 'RAW'))
 
             if not bool(dictPlotTitles_Index):
                 print("No plots of type (" + plotType +
@@ -109,7 +110,7 @@ class plotter_PIPE3D(PlotterABC):
                     # fig.tight_layout()
                     # plt.show()
                     # print(jello)
-                    plt.savefig(nFPraw + newFileName + '.png')
+                    plt.savefig(os.path.join(nFPraw,newFileName + '.png'))
                     # print(jello)
                     plt.close()
 

@@ -5,6 +5,7 @@ Created on Sep 8, 2017
 '''
 
 import numpy as np
+import os
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib.colors as mclr
@@ -65,8 +66,8 @@ def plotRatioPlots(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP):
     fig.tight_layout()
     # plt.show()
     # print(jello)
-    plt.savefig(nFP + galaxy.PLATEIFU + '_' +
-                plotType + '.png', bbox_inches='tight')
+    plt.savefig(os.path.join(nFP, galaxy.PLATEIFU + '_' +
+                plotType + '.png'), bbox_inches='tight')
     # print(jello)
     plt.close()
 

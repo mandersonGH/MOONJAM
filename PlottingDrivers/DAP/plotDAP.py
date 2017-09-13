@@ -13,11 +13,11 @@ import os
 
 class plotter_DAP(PlotterABC):
 
-    resourceFolder = os.path.abspath(
-        os.path.join(__file__, "../../..")) + "/resources/"
+    resourceFolder = os.path.join(os.path.abspath(
+        os.path.join(__file__, "..", "..", "..")), "resources")
 
     potentialDefaultCubePlots = eval(
-        open(resourceFolder + "potentialDefaultCubePlots.txt").read())
+        open(os.path.join(resourceFolder, "potentialDefaultCubePlots.txt")).read())
 
     def __init__(self, mplNum):
         self.DAPtype = mplNum

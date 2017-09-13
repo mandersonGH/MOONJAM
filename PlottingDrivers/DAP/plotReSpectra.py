@@ -5,7 +5,7 @@ Created on Sep 8, 2017
 '''
 
 import numpy as np
-
+import os
 import matplotlib.pyplot as plt
 
 import Utilities.helperFuncs as hF
@@ -17,8 +17,8 @@ from PlottingTools.plotFuncs import CAS_spectra
 
 
 def plotReSpectra(EADir, galaxy, DAPtype, plotType, dataInd, dataCube, waveVec):
-    nFP = dF.assure_path_exists(
-        EADir + DAPtype + '/PLOTS/DAP/' + galaxy.PLATEIFU + '/ReSpectra/')
+    nFP = dF.assure_path_exists(os.join.path(
+        EADir, DAPtype, 'PLOTS', 'DAP', galaxy.PLATEIFU, 'ReSpectra'))
     # unitsY = hdu[0].header['BUNIT']
     unitsX = 'Wavelength (Angstroms)'
     # unitsY = '$' + unitsY + '$'
@@ -170,8 +170,8 @@ def plotSideBySideSpectra(plate_IFU, radii, waveVec, ReSpectra, dictRadiiSpaxNum
     # fig.tight_layout()
     # plt.show()
     # print(jello)
-    plt.savefig(nFP + plate_IFU + '_' + extraLabel +
-                'SideBySideReSpectra.png', bbox_inches='tight')
+    plt.savefig(os.path.join(nFP, plate_IFU + '_' + extraLabel +
+                'SideBySideReSpectra.png'), bbox_inches='tight')
     # print(jello)
     plt.close()
 
@@ -210,7 +210,7 @@ def plotStackedSpectra(plate_IFU, radii, waveVec, ReSpectra, dictRadiiSpaxNum, u
     fig.tight_layout()
     plt.show()
     #print(jello)
-    plt.savefig(nFP + plate_IFU + '_' + extraLabel +
-                'StackedReSpectra.png', bbox_inches='tight')
+    plt.savefig(os.path.join(nFP, plate_IFU + '_' + extraLabel +
+                'StackedReSpectra.png'), bbox_inches='tight')
     # print(jello)
     plt.close()

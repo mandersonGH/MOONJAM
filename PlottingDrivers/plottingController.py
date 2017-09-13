@@ -9,11 +9,15 @@ import os
 
 
 class plottingController(object):
-    resourceFolder = os.path.abspath(
-        os.path.join(__file__, "../..")) + "/resources/"
-    dictMPL4files = eval(open(resourceFolder + "dictMPL4files.txt").read())
-    dictMPL5files = eval(open(resourceFolder + "dictMPL5files.txt").read())
-    dictPIPE3Dfiles = eval(open(resourceFolder + "dictPIPE3Dfiles.txt").read())
+    resourceFolder = os.path.join(os.path.abspath(
+        os.path.join(__file__, "..", "..")), "resources")
+
+    dictMPL4files = eval(
+        open(os.path.join(resourceFolder, "dictMPL4files.txt")).read())
+    dictMPL5files = eval(
+        open(os.path.join(resourceFolder, "dictMPL5files.txt")).read())
+    dictPIPE3Dfiles = eval(
+        open(os.path.join(resourceFolder, "dictPIPE3Dfiles.txt")).read())
 
     def __init__(self, EADirectory, galaxy, plotsToBeCreated, opts):
         self.myEADirectory = EADirectory

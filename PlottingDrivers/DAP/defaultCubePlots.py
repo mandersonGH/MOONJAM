@@ -16,15 +16,17 @@ def defaultCubePlots(EADir, galaxy, plotType, DAPtype):
     plotType = formatPlotType(plotType, DAPtype)
     emLineInd, emLineFancy = initializeEmLineDict(galaxy.myHDU, plotType)
 
-    resourceFolder = os.path.abspath(
-        os.path.join(__file__, "../../..")) + "/resources/"
+    resourceFolder = os.path.join(os.path.abspath(
+        os.path.join(__file__, "..", "..", "..")), "resources")
 
-    ratioPlots = eval(open(resourceFolder + "typesOfRatioPlots.txt").read())
+    ratioPlots = eval(
+        open(os.path.join(resourceFolder, "typesOfRatioPlots.txt")).read())
+
     typesOfBPT = extractTypesOfBPT(DAPtype)
 
     if plotType in ratioPlots:
-        nFP = dF.assure_path_exists(
-            EADir + '/' + DAPtype + '/PLOTS/DAP/' + galaxy.PLATEIFU + '/Ratio Plots/')
+        nFP = dF.assure_path_exists(os.path.join(
+            EADir, DAPtype, "PLOTS", "DAP", galaxy.PLATEIFU, "Ratio Plots"))
         if plotType == 'BPT':
             for typeOfBPT in typesOfBPT:
                 plotRatioPlots(EADir, galaxy, plotType +
@@ -34,8 +36,8 @@ def defaultCubePlots(EADir, galaxy, plotType, DAPtype):
                            emLineInd, emLineFancy, nFP)
     else:
         # non ratio plot
-        nFP = dF.assure_path_exists(
-            EADir + '/' + DAPtype + '/PLOTS/DAP/' + galaxy.PLATEIFU + '/' + plotType + '/')
+        nFP = dF.assure_path_exists(os.path.join(
+            EADir, DAPtype, "PLOTS", "DAP", galaxy.PLATEIFU, plotType))
         dataInd, errInd, maskInd = getHduIndices(plotType)
         galaxy.extractDataCubes(dataInd, errInd, maskInd)
         correctErrorCube(galaxy, plotType)
