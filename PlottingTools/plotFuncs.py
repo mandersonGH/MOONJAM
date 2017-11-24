@@ -205,6 +205,11 @@ def opticalImage(EADir, galaxy, dataInd, axes):
     # extentVec = pT.centerVec(extentVec)
     imgType = ''
     try:
+    	FileNotFoundError
+    except NameError:
+        #py2
+        FileNotFoundError = IOError
+    try:
         visualImage = mpimg.imread(os.path.join(
             EADir, "CAS", galaxy.PLATEIFU, 'Visual.png'))
         imgType = 'png'

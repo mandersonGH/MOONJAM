@@ -12,7 +12,10 @@ def getFilename(fullFilePath):
 def assure_path_exists(path):
     # from
     # https://justgagan.wordpress.com/2010/09/22/python-create-path-or-directories-if-not-exist/
-    dir = os.path.dirname(path)
+    if '.' in os.path.basename(path):
+    	dir = os.path.dirname(path)
+    else:
+        dir = path
     if not os.path.exists(dir):
         os.makedirs(dir)
         print("New directory made {" + dir + "/}")

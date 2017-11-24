@@ -11,6 +11,7 @@ from astropy.io import fits
 from GalaxyObject.Galaxy import Galaxy
 from PlottingDrivers.plottingController import plottingController
 import os
+import sys
 
 
 class Controller:
@@ -33,6 +34,10 @@ class Controller:
         # EADirectory - where all plots and data are saved
         # opts - the arguments following the run command that dictate what
         # plots the user wants to produce
+
+	if(not EADirectory or (not opts or len(opts) < 1)):
+		print("Not enough inputs were supplied. Please specify the type of data you would like to generate plots for (e.g. MPL4 or MPL5) and the type of plots you would like")
+		sys.exit()
         print()
         timer = Stopwatch()
         timer.start()
@@ -60,10 +65,13 @@ class Controller:
             for user_input in self.inputs:
                 opts.append(user_input)
         except IndexError:
-            print("No extra arguments supplied")
+            print("No directory and/or plot type arguments supplied")
+            print("Please read documentation of what arguments need to be supplied")
+            return None, None
         except ValueError:
             # opts = initiateUserInterface()
             print("no user interface built")
+	    return None, None
 
         opts = [opt.lower() for opt in opts]
         return opts, os.path.abspath(EADirectory)
@@ -93,8 +101,12 @@ class Controller:
 
     def makeFilePlotDict(self, opts, EADirectory, dictFileTypes):
         filePlotDict = defaultdict(list)
+	print("These are the types of plots you can create for this data source")
+	for key in dictFileTypes.keys():
+		print("   -" + key)
         for key in dictFileTypes.keys():
             if key in opts:
+		print("You requested: " + key)
                 fileType = dictFileTypes[key]
                 fileList = dF.locate(fileType, True, rootD=EADirectory)
                 fileList_gz = dF.locate(
