@@ -64,8 +64,9 @@ def plotQuadPlot(EADir, galaxy, nFP, dataInd, slice, newFileName, plotTitle, vma
 
     # fig.tight_layout()
     try:
-        #plt.show()
-        #print(jello)
+        # plt.show()
+        # print(jello)
+        print("saving to " + os.path.join(nFP, newFileName + '.png'))
         plt.savefig(os.path.join(nFP, newFileName + '.png'))
     except AttributeError:
         print("Error generating plots. Plot not saved :: "+ os.path.join(nFP, newFileName + '.png'))
@@ -87,7 +88,7 @@ def pickColorMap(plotType):
         cmap = mclr.ListedColormap(['cornflowerblue', 'orange', 'yellowgreen'])
     else:
         cmap = cm.get_cmap('jet')
-    # cmap = CALIFAcmap.get_califa_intensity_cmap()
+    cmap = CALIFAcmap.get_califa_velocity_cmap()
     # cmap = cm.get_cmap('coolwarm', 3)
     return cmap
 
@@ -198,6 +199,7 @@ def plotComparisonPlots(galaxy, dataInd, nFP, EADir, plotType, newFileName1, new
 
     # plt.show()
     # print(jello)
+    print('saving to '+ os.path.join(nFP, 'Comparison of ' + newFileName + '.png'))
     plt.savefig(os.path.join(nFP, 'Comparison of ' + newFileName +
                 '.png'), bbox_inches='tight')
     plt.close()

@@ -41,7 +41,7 @@ class Controller:
         # opts - the arguments following the run command that dictate what
         # plots the user wants to produce
 
-    	if(not EADirectory or (not opts or len(opts) < 1)):
+        if(not EADirectory or (not opts or len(opts) < 1)):
             self.exitProgram("Not enough inputs were supplied. Please specify the type of data you would like to generate plots for (e.g. MPL4 or MPL5) and the type of plots you would like")
         print()
         timer = Stopwatch()
@@ -72,7 +72,7 @@ class Controller:
         except ValueError:
             # opts = initiateUserInterface()
             print("no user interface built")
-	    return None, None
+            return None, None
 
         opts = [opt.lower() for opt in opts]
         return opts, os.path.abspath(EADirectory)
@@ -93,21 +93,21 @@ class Controller:
             print('     ' +     os.path.join(EADirectory, "MPL-5", "DATA", "DAP"))
             fileDict.update(self.makeFilePlotDict(
                 opts,           os.path.join(EADirectory, "MPL-5", "DATA", "DAP"), self.dictMPL5files))
-            # if 'pipe3d' in opts:
-            #    fileDict.update(self.makeFilePlotDict(
-            # opts, EADirectory + "MPL-5\\DATA\\PIPE3D\\",
-            # self.dictPIPE3Dfiles))
+            if 'pipe3d' in opts:
+                print('     ' + os.path.join(EADirectory, "MPL-5", "DATA", "PIPE3D"))
+                fileDict.update(self.makeFilePlotDict(
+                    opts,       os.path.join(EADirectory, "MPL-5", "DATA", "PIPE3D"), self.dictPIPE3Dfiles))
         print("")
         return fileDict
 
     def makeFilePlotDict(self, opts, EADirectory, dictFileTypes):
         filePlotDict = defaultdict(list)
-	print("These are the types of plots you can create for this data source")
-	for key in dictFileTypes.keys():
-		print("   -" + key)
+        print("These are the types of plots you can create for this data source")
+        for key in dictFileTypes.keys():
+            print("   -" + key)
         for key in dictFileTypes.keys():
             if key in opts:
-		        print("You requested: " + key)
+                print("You requested: " + key)
                 fileType = dictFileTypes[key]
                 fileList = dF.locate(fileType, True, rootD=EADirectory)
                 fileList_gz = dF.locate(
