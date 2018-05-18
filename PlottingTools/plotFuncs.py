@@ -63,10 +63,13 @@ def plotQuadPlot(EADir, galaxy, nFP, dataInd, slice, newFileName, plotTitle, vma
         plotAxisCrossSections(galaxy, slice, hex_at_Cen, gal_at_Cen, axes2)
 
     # fig.tight_layout()
-    # plt.show()
-    # print(jello)
-    plt.savefig(os.path.join(nFP, newFileName + '.png'))
-    # print(jello)
+    try:
+        #plt.show()
+        #print(jello)
+        plt.savefig(os.path.join(nFP, newFileName + '.png'))
+    except AttributeError:
+        print("Error generating plots. Plot not saved :: "+ os.path.join(nFP, newFileName + '.png'))
+    #print(jello)
     plt.close()
 
 
