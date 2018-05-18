@@ -11,6 +11,7 @@ from astropy.io import fits
 from GalaxyObject.Galaxy import Galaxy
 from PlottingDrivers.plottingController import plottingController
 import os
+import sys
 
 
 class Controller:
@@ -28,20 +29,27 @@ class Controller:
     def __init__(self, args):
         self.inputs = args
 
+    def exitProgram(self, message):
+        print("Program Error - Exiting...")
+        print("    Error message : " + message)
+        print("")
+        sys.exit()
+
     def run(self):
         opts, EADirectory = self.obtainUserOptsInput()
         # EADirectory - where all plots and data are saved
         # opts - the arguments following the run command that dictate what
         # plots the user wants to produce
+
+    	if(not EADirectory or (not opts or len(opts) < 1)):
+            self.exitProgram("Not enough inputs were supplied. Please specify the type of data you would like to generate plots for (e.g. MPL4 or MPL5) and the type of plots you would like")
         print()
         timer = Stopwatch()
         timer.start()
         fileDict = self.requiredFileSearch(opts, EADirectory)
         if not fileDict:
-            print("")
-            print(
+            self.exitProgram(
                 r"No files were found in the directory supplied. The program will now close. Avoiding ending the directory with the character '\' and put the entire directory in quotes if there are any spaces in the path")
-            print("")
             timer.stop()
         else:
             print("")
@@ -60,10 +68,11 @@ class Controller:
             for user_input in self.inputs:
                 opts.append(user_input)
         except IndexError:
-            print("No extra arguments supplied")
+            self.exitProgram("No directory and/or plot type arguments supplied. Please read documentation of what arguments need to be supplied")
         except ValueError:
             # opts = initiateUserInterface()
             print("no user interface built")
+	    return None, None
 
         opts = [opt.lower() for opt in opts]
         return opts, os.path.abspath(EADirectory)
@@ -73,17 +82,17 @@ class Controller:
         print("")
         print('The program will search this directory for .fits and .fits.gz files:')
         if 'mpl4' in opts:
-            print('     ' + os.path.join(EADirectory, "MPL-4", "DATA", "DAP"))
+            print('     ' +     os.path.join(EADirectory, "MPL-4", "DATA", "DAP"))
             fileDict.update(self.makeFilePlotDict(
-                opts, os.path.join(EADirectory, "MPL-4", "DATA", "DAP"), self.dictMPL4files))
+                opts,           os.path.join(EADirectory, "MPL-4", "DATA", "DAP"), self.dictMPL4files))
             if 'pipe3d' in opts:
                 print('     ' + os.path.join(EADirectory, "MPL-4", "DATA", "PIPE3D"))
                 fileDict.update(self.makeFilePlotDict(
-                    opts, os.path.join(EADirectory, "MPL-4", "DATA", "PIPE3D"), self.dictPIPE3Dfiles))
+                    opts,       os.path.join(EADirectory, "MPL-4", "DATA", "PIPE3D"), self.dictPIPE3Dfiles))
         if 'mpl5' in opts:
-            print('     ' + os.path.join(EADirectory, "MPL-5", "DATA", "DAP"))
+            print('     ' +     os.path.join(EADirectory, "MPL-5", "DATA", "DAP"))
             fileDict.update(self.makeFilePlotDict(
-                opts, os.path.join(EADirectory, "MPL-5", "DATA", "DAP"), self.dictMPL5files))
+                opts,           os.path.join(EADirectory, "MPL-5", "DATA", "DAP"), self.dictMPL5files))
             # if 'pipe3d' in opts:
             #    fileDict.update(self.makeFilePlotDict(
             # opts, EADirectory + "MPL-5\\DATA\\PIPE3D\\",
@@ -93,8 +102,12 @@ class Controller:
 
     def makeFilePlotDict(self, opts, EADirectory, dictFileTypes):
         filePlotDict = defaultdict(list)
+	print("These are the types of plots you can create for this data source")
+	for key in dictFileTypes.keys():
+		print("   -" + key)
         for key in dictFileTypes.keys():
             if key in opts:
+		        print("You requested: " + key)
                 fileType = dictFileTypes[key]
                 fileList = dF.locate(fileType, True, rootD=EADirectory)
                 fileList_gz = dF.locate(
