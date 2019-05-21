@@ -20,28 +20,24 @@ def addCrossHairs(axes, plate_IFU, Re, hex_at_Cen):
     plt.plot(minX, minY, colorForLines, linewidth=lw)
 
 
-def addReCircles(axes):
-    circle1 = plt.Circle((0, 0), 1, color=colorForLines,
-                         fill=False, linewidth=lw)
-    axes.add_artist(circle1)
-    circle2 = plt.Circle((0, 0), 2, color=colorForLines,
-                         fill=False, linewidth=lw)
-    axes.add_artist(circle2)
-    circle3 = plt.Circle((0, 0), 3, color=colorForLines,
-                         fill=False, linewidth=lw)
-    axes.add_artist(circle3)
-
+def addReCircles(axes, colors=[colorForLines] * 3):
+    for i in range(3):
+        axes.add_artist(plt.Circle(
+            (0, 0), # center
+            i + 1,  # radius
+            color=colors[i],
+            fill=False,
+            linewidth=lw
+        ))
 
 def plotHexagon(axes, plate_IFU, scale=1):
     IFU = plate_IFU.split("-")[1]
     fiberNo = int(IFU[:IFU.find('0')])
 
     size = float(EA_data.hexSizeDict[fiberNo]) / scale
-    center = [0, 0]
     x1, x2 = axes.get_xlim()
     y1, y2 = axes.get_ylim()
-    center[0] = np.mean([x1, x2])
-    center[1] = np.mean([y1, y2])
+    center = [ np.mean([x1, x2]), np.mean([y1, y2]) ]
 
     patch_list = []
     patch_list.append(RegularPolygon(
@@ -50,7 +46,7 @@ def plotHexagon(axes, plate_IFU, scale=1):
         radius=size,
         orientation=(np.pi / 180) * 30,  # rotated 30 degrees [in radians]
         facecolor='none',
-        edgecolor='magenta',
+        edgecolor='darkgrey',
         lw=2
     ))
 

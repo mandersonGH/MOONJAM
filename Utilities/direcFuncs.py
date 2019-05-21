@@ -29,6 +29,8 @@ def locate(endOfFilename, subBin, rootD=os.curdir):
     if subBin is True:
         #         print(rootD)
         for root, dirnames, filenames in os.walk(rootD):
+            if 'DISCARD' in root:
+                continue
             for filename in fnmatch.filter(filenames, pattern):
                 matches.append(os.path.join(root, filename))
     else:

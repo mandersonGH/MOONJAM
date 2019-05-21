@@ -8,6 +8,8 @@ from GalaxyObject.fitsExtraction import *
 
 
 def axisEndpoints(plate_IFU, Re, hex_at_Cen):
+    if plate_IFU not in EA_data.dictMajMinAxis:
+        return None
     endPoints = EA_data.dictMajMinAxis[plate_IFU]
 
     majX = [(float(endPoints[0][i][0] - hex_at_Cen[0]) / Re) for i in range(2)]

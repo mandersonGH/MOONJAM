@@ -51,33 +51,51 @@ def getCenters(hdu, plate_IFU, dataInd):
 
 
 def getRe(EADir, DAPtype, plate_IFU):
+    drpallData = extractDataFromDrpall(EADir, "MPL-5", plate_IFU)
+    ReCol = extractReColFromDrpall(EADir, "MPL-5")
+    if drpallData is not None and ReCol is not None:
+        return drpallData[ReCol]
+
+    drpallData = extractDataFromDrpall(EADir, "MPL-4", plate_IFU)
+    ReCol = extractReColFromDrpall(EADir, "MPL-4")
+    if drpallData is not None and ReCol is not None:
+        return drpallData[ReCol]
+
+    return None
+
+def getDrpallFilepath(EADir, DAPtype):
     drpallFilename = ""
     if DAPtype == "MPL-4":
         drpallFilename = 'drpall-v1_5_1.fits'
     elif DAPtype == "MPL-5":
         drpallFilename = 'drpall-v2_0_1.fits'
+    return os.path.join(EADir, DAPtype, "DATA", drpallFilename)
 
-    drpallFile = os.path.join(EADir, DAPtype, "DATA", drpallFilename)
 
-    try:
-        drpall = fits.open(drpallFile)
+def extractDataFromDrpall(EADir, DAPtype, plate_IFU):
+    drpallFilename = getDrpallFilepath(EADir, DAPtype)
+    drpall = fits.open(drpallFilename)
+    data = None
+    for i in range(0, len(drpall[1].data)):
+        if drpall[1].data[i][2] == plate_IFU:
+            data = drpall[1].data[i]
+            break
+    drpall.close()
+    if data is None:
+        print('No entry in drpall file ({}) for galaxy {}'.format(drpallFilename, plate_IFU))
+    return data
 
-        for i in range(1, len(drpall[1].data[0]) + 1):
-            if 'nsa_petro_th50' == str(drpall[1].header['TTYPE' + str(i)]):
-                ReCol = i - 1
-                break
-
-        for i in range(0, len(drpall[1].data)):
-            if drpall[1].data[i][2] == plate_IFU:
-                Re = drpall[1].data[i][ReCol]
-                # effective radius in arcsec
-                break
-
-        drpall.close()
-    except TypeError:
-        Re = 10
-    return Re
-
+def extractReColFromDrpall(EADir, DAPtype):
+    drpall = fits.open(getDrpallFilepath(EADir, DAPtype))
+    ReCol = None
+    for i in range(1, len(drpall[1].data[0]) + 1):
+        # print(str(drpall[1].header['TTYPE' + str(i)]))
+        if 'nsa_petro_th50' == str(drpall[1].header['TTYPE' + str(i)]):
+            ReCol = i - 1
+    drpall.close()
+    if ReCol is None:
+        print('No {} value in drpall file for galaxy {}'.format('nsa_petro_th50', plate_IFU))
+    return ReCol
 
 def getNAXIS3(hdu):
     if hdu[0].header['NAXIS'] != 3:
