@@ -66,21 +66,7 @@ The directory must be organized with a specific hierarchy due to the saving mech
 3. Run the main.py module in python with additional arguments as required
 	 - First type "python"
 	 - Followed by the relative path of the main.py file 
-	 - Then the relative path of the directory that contains the galaxy .fits files (as layed out above in Directory Requirements)
-	 - Then the types of diagrams wanted along with sources of the .fits files
-	 	- Additional Parameters: (case insensitive)
-	 		- "WHAN" for WHAN diagrams
-	 		- "BPT" for BPT diagrams
-	 		- "EMLINES_GFLUX" for emission line plots using GFLUX measurements
-	 		- "EMLINES_EW" for emission line plots using GFLUX measurements
-	 		- "ReSpectra" for radial spectral binning plots
-	 		- "MPL4" to use galaxies included in MPL-4
-	 		- "MPL5" to use galaxies included in MPL-5
-	 		- "PIPE3D" to create PIPE3D plots (with its own options listed as the keys of a dictionary in "./resources/dictPIPE3Dfiles.txt"
-	- Examples: (assuming you are in a directory with "MOONJAM" and "E + A Directory" folders)
-		- ``` python ./Main/main.py ./E + A Directory/ mpl5 emlines_gflux ``` 
-		- ``` python ./Main/main.py ./E + A Directory/ mpl4 bpt emlines_gflux ``` 
-		- ``` python ./Main/main.py ./E + A Directory/ mpl5 mpl4 bpt whan emlines_ew ``` 
+         - Followed by the additional arguments (run without these arguments to see the current option)
 
 That should do it!! In the directory supplied there should be a new PLOTS folder with the plots saved.
 
