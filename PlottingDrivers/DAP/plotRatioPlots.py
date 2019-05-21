@@ -19,9 +19,12 @@ import PlottingTools.drawOnPlots as dOP
 from EmissionLine.EmissionLineSlice import EmissionLineSlice
 np.seterr(divide='ignore', invalid='ignore')
 
+re_colors = ['olive', 'tomato', 'darkturquoise', 'purple']
 
 def plotRatioPlots(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP):
     dataInd = 1
+
+    # print(galaxy)
 
     xValues, yValues, disValues, labelMat, mask, labels, counts = extractData(
         galaxy.myHDU, plotType, galaxy.Re, emLineInd, dataInd)
@@ -31,14 +34,23 @@ def plotRatioPlots(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP):
     slice.setMask(mask)
     slice.setUnits('Some units')
 
-#     print(counts)
-#     if plotType == "BPT":
-#         labelVec = ['SF', 'Sy', 'Inter']
-#     elif plotType == 'WHAN':
-#         labelVec = ['SF', 'AGN', 'old stars']
-#     print(plate_IFU)
-#     for i in range(len(labelVec)):
-#         print(labelVec[i] + ":  " + str(round(counts[i + 1] / counts[0] * 100, 2)) + '%')
+    # print(counts)
+    # if plotType.startswith('BPT'):
+    #     labelVec = ['SF', 'Sy', 'Inter']
+    # elif plotType == 'WHAN':
+    #     labelVec = ['SF', 'AGN', 'old stars']
+    
+    # for i in range(len(labelVec)):
+    #     print(labelVec[i] + ":  " + str(round(counts[i + 1] / counts[0] * 100, 2)) + '%')
+
+    print("{},{},{},{},{}".format(
+        galaxy.PLATEIFU,
+        plotType,
+        str(round(counts[1] / counts[0] * 100, 2)) + '%',
+        str(round(counts[2] / counts[0] * 100, 2)) + '%',
+        str(round(counts[3] / counts[0] * 100, 2)) + '%'
+    ))
+    return
 
     hex_at_Cen, gal_at_Cen = pT.getCenters(
         galaxy.myHDU, galaxy.PLATEIFU, dataInd)
@@ -47,27 +59,30 @@ def plotRatioPlots(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP):
     vmin = np.amin(labelMat)
     if vmin == 0:
         vmin = 1
-    aspectRatio = 29.0 / 8
-    height = 8
-    fig = plt.figure(figsize=(height * aspectRatio, height))
+
+    num_axes = 2
+    axes_width = 9.66
+    axes_height = 8
+
+    fig = plt.figure(figsize=(axes_width * num_axes, axes_height))
     # plt.suptitle(plotType + ' Analysis :: ' + plate_IFU, fontsize=17)
 
-    axes1 = plt.subplot(1, 3, 1)
-    pF.opticalImage(EADir, galaxy, dataInd, axes1)
+    # axes1 = plt.subplot(1, 3, 1)
+    # pF.opticalImage(EADir, galaxy, dataInd, axes1)
 
-    axes2 = plt.subplot(1, 3, 2)
+    axes2 = plt.subplot(1, 2, 1)
     ratioAxes(plotType, emLineFancy, xValues,
               yValues, disValues, labels, axes2)
 
-    axes3 = plt.subplot(1, 3, 3)
+    axes3 = plt.subplot(1, 2, 2)
     pF.spatiallyResolvedPlot(galaxy, plotType, plotType, dataInd,
                              slice, hex_at_Cen, gal_at_Cen, vmax, vmin, axes3)
-    dOP.addReCircles(axes3)
+    dOP.addReCircles(axes3, re_colors)
     fig.tight_layout()
     # plt.show()
     # print(jello)
     plt.savefig(os.path.join(nFP, galaxy.PLATEIFU + '_' +
-                plotType + '.png'), bbox_inches='tight')
+                plotType + '_NO_IM_colored_circles.png'), bbox_inches='tight')
     # print(jello)
     plt.close()
 
@@ -253,21 +268,22 @@ def processRatioData(plotType, xMat, yMat, dMat, mask):
                         labelMat[i, j] = 1
                     else:
                         labelMat[i, j] = 2
-                if isinstance(labelMat[i, j], int):
-                    counts[labelMat[i, j]] += 1
+                if labelMat[i, j] == round(labelMat[i, j]):
+                    # aka isInt
+                    counts[int(labelMat[i, j])] += 1
                 counts[0] += 1
 
     return x, y, d, labelMat, counts
 
 
 def ratioAxes(plotType, emLineFancy, x, y, d, labels, axes):
-    cmap = mclr.ListedColormap(['olive', 'tomato', 'darkturquoise', 'purple'])
+    cmap = mclr.ListedColormap(re_colors)
     plt.scatter(x, y, c=d, s=20, lw=0.25, cmap=cmap, vmin=0, vmax=4)
     cbar = plt.colorbar()
     cbar.set_label("$R/R_e$", fontsize=pF.fontsize, fontweight='bold')
     dip = .01
     cbar.set_ticks([1 - dip, 2 - dip, 3 - dip, 4])
-    cbar.set_ticklabels(['1', '2', '3', '4'])
+    cbar.set_ticklabels(['1', '2', '3', '4+'])
     cbar.ax.tick_params(labelsize=pF.fontsize - 5)
 
     xmin, xmax = axes.get_xlim()

@@ -24,6 +24,9 @@ from PlottingDrivers.PIPE3D.plotSFH import plotSFH
 
 class plotter_PIPE3D(PlotterABC):
 
+    def __init__(self, mplNum):
+        self.DAPtype = mplNum
+
     def createSlice(self, dataMat, maskMat, units):
         slice = EmissionLineSlice()
         slice.setData(dataMat)
@@ -32,138 +35,235 @@ class plotter_PIPE3D(PlotterABC):
         return slice
 
     def plot(self, EADir, galaxy, plotType):
+        
 
-        if plotType == 'sfh':
+        if plotType == 'sfh' and self.DAPtype == 'MPL-4':
             plotSFH(EADir, galaxy)
         else:
-            if plotType == 'flux_elines':
-                if not galaxy.myFilename.startswith(plotType):
-                    print("No plots of type (" + plotType +
-                          ") to make for the file " + galaxy.myFilename)
-                    return
-            if plotType == 'indices.cs':
-                if not galaxy.myFilename.startswith(plotType[:7]):
-                    print("No plots of type (" + plotType +
-                          ") to make for the file " + galaxy.myFilename)
-                    return
+            if not self.are_there_plots_to_make(galaxy.myFilename, plotType):
+                return
+            # print(galaxy.myFilename)
+            # print(plotType)
 
+            PIPE3D_Dir = os.path.join(EADir, self.DAPtype, "PLOTS", "PIPE3D")
+            # print("PIPE3D_Dir=" + str(PIPE3D_Dir))
+            
             galaxy.setCenterType('HEX')
-            galaxy.pullRe(EADir, 'MPL-4')
-
+            
+            galaxy.pullRe(EADir, self.DAPtype)
+            # print("Re=" + str(galaxy.Re))
+            
             NAXIS3 = fE.getNAXIS3(galaxy.myHDU)
-
+            # print("NAXIS3=" + str(NAXIS3))
+            
             titleHdr = fE.getTitleHeaderPrefix(galaxy.myHDU)
+            # print("titleHdr=" + str(titleHdr))
 
             dataInd = 0
+            # print("dataInd=" + str(dataInd))
 
-            dictPlotTitles_Index, dictPlotTitles_Error, dictPlotTitles_Pair = self.createDictionaries(
-                galaxy, NAXIS3, titleHdr, dataInd)
+            plotsToMake = self.createDictionaries(galaxy,
+                                                  NAXIS3,
+                                                  titleHdr,
+                                                  dataInd)
+            numberOfNormalPlotsToMake = sum([1 for p in plotsToMake.keys() if 'index' in plotsToMake[p]])
+            numberOfErrorPlotsToMake = sum([1 for p in plotsToMake.keys() if 'error' in plotsToMake[p]])
+            numberOfPairPlotsToMake = sum([1 for p in plotsToMake.keys() if 'pair' in plotsToMake[p]])
 
-            PIPE3D_Dir = os.path.join(EADir, "MPL-4", "PLOTS", "PIPE3D")
+            print(
+                "normalPlots=" + str(numberOfNormalPlotsToMake),
+                "errorPlots=" + str(numberOfErrorPlotsToMake),
+                "pairPlots=" + str(numberOfPairPlotsToMake)
+            )
+            
+            if plotType == 'requested' or plotType == 'requested2':
+                # if requested plots then remove unecessary plot titles and change directory
+                requestedWithin = [
+                    ['velocity', 'stellar population'],
+                    ['Ha'],
+                    ['Hd'],
+                    ['Halpha']
+                ]
+                plotsToMake = self.removeNonRequested( plotsToMake, requestedWithin )
 
-            if plotType == 'requested':
-                requestedWithin = [['velocity', 'stellar population'], [
-                    'Ha'], ['Hd'], ['Halpha']]
+                numberOfNormalPlotsToMake = sum([1 for p in plotsToMake.keys() if 'index' in plotsToMake[p]])
+                numberOfErrorPlotsToMake = sum([1 for p in plotsToMake.keys() if 'error' in plotsToMake[p]])
+                numberOfPairPlotsToMake = sum([1 for p in plotsToMake.keys() if 'pair' in plotsToMake[p]])
 
-                dictPlotTitles_Index, dictPlotTitles_Error, dictPlotTitles_Pair = self.removeNonRequested(
-                    dictPlotTitles_Index, dictPlotTitles_Error, dictPlotTitles_Pair, requestedWithin)
+                print(
+                    "normalPlots=" + str(numberOfNormalPlotsToMake),
+                    "errorPlots=" + str(numberOfErrorPlotsToMake),
+                    "pairPlots=" + str(numberOfPairPlotsToMake)
+                )
 
-                nFP = dF.assure_path_exists(os.path.join(
-                    PIPE3D_Dir, plotType, galaxy.PLATEIFU))
-                nFPraw = ''
-            else:
-                nFP = dF.assure_path_exists(os.path.join(
-                    PIPE3D_Dir, galaxy.PLATEIFU, plotType))
-                nFPraw = dF.assure_path_exists(os.path.join(
-                    PIPE3D_Dir, galaxy.PLATEIFU, plotType, 'RAW'))
 
-            if not bool(dictPlotTitles_Index):
+
+            if numberOfNormalPlotsToMake == 0:
                 print("No plots of type (" + plotType +
-                      ") to make for the file " + galaxy.myFilename)
+                       ") to make for the file " + galaxy.myFilename)
                 return
-            elif nFPraw != '':
-                hex_at_Cen, gal_at_Cen = fE.getCenters(
+            
+            nFP, nFPraw = self.create_directories(plotType, PIPE3D_Dir, galaxy.PLATEIFU)
+
+            hex_at_Cen, gal_at_Cen = fE.getCenters(
                     galaxy.myHDU, galaxy.PLATEIFU, dataInd)
-                for key in dictPlotTitles_Index.keys():
-                    if key in dictPlotTitles_Error.values():
-                        continue
-                    dataMat, maskMat, newFileName, plotTitle, units = self.prepData(
-                        dictPlotTitles_Index, key, galaxy, dataInd, NAXIS3)
-                    if dataMat is None:
-                        continue
-                    aspectRatio = 16.0 / 13
-                    height = 10
-                    fig = plt.figure(figsize=(aspectRatio * height, height))
-                    plt.suptitle(galaxy.PLATEIFU + " :: " + newFileName)
-                    axes = plt.gca()
-                    slice = self.createSlice(dataMat, maskMat, units)
-                    pF.spatiallyResolvedPlot(galaxy,
-                                             plotType,
-                                             newFileName,
-                                             dataInd,
-                                             slice,
-                                             hex_at_Cen,
-                                             gal_at_Cen,
-                                             None,
-                                             None,
-                                             axes)
-                    # fig.tight_layout()
-                    # plt.show()
-                    # print(jello)
-                    plt.savefig(os.path.join(nFPraw,newFileName + '.png'))
-                    # print(jello)
-                    plt.close()
 
-            if bool(dictPlotTitles_Error):
-                for key in dictPlotTitles_Error.keys():
-                    dataMat, maskMat, newFileName, plotTitle, units = self.prepData(
-                        dictPlotTitles_Index, key, galaxy, dataInd, NAXIS3)
-                    if dataMat is None:
+            for rawPlotTitle, plotInfo in plotsToMake.items():
+                dataMat, maskMat, newFileName, plotTitle, units = self.prepData(
+                    plotInfo['index'],
+                    rawPlotTitle,
+                    galaxy,
+                    dataInd,
+                    NAXIS3
+                )
+                if dataMat is None:
+                    return
+                slice = self.createSlice(dataMat, maskMat, units)
+
+                if nFPraw != '':
+                    try:
+                        self.plotRaw(galaxy,
+                                     newFileName,
+                                     dataInd,
+                                     plotType,
+                                     slice,
+                                     hex_at_Cen,
+                                     gal_at_Cen,
+                                     nFPraw)
+                    except Exception as e:
+                        print(e)
+                        plt.close()
                         continue
-                    keyOfError = dictPlotTitles_Error[key]
-                    errMat = galaxy.myHDU[dataInd].data[dictPlotTitles_Index[keyOfError]]
-                    slice = self.createSlice(dataMat, maskMat, units)
+                
+                if numberOfNormalPlotsToMake < 20:
+                    pF.plotDuoPlot(EADir,
+                                   galaxy,
+                                   nFP,
+                                   dataInd,
+                                   slice,
+                                   newFileName,
+                                   plotTitle,
+                                   plotType,
+                                   vmax=None,
+                                   vmin=None)
+
+
+                if 'error' in plotInfo.keys():
+                    errorPlotTitle = plotInfo['error']
+                    errMat = galaxy.myHDU[dataInd].data[plotsToMake[errorPlotTitle]['index']]
                     slice.setError(errMat)
-                    pF.plotQuadPlot(EADir,
-                                    galaxy,
-                                    nFP,
-                                    dataInd,
-                                    slice,
-                                    newFileName,
-                                    plotTitle,
-                                    vmax=None,
-                                    vmin=None)
+                    try:
+                        pF.plotQuadPlot(EADir,
+                                        galaxy,
+                                        nFP,
+                                        dataInd,
+                                        slice,
+                                        newFileName,
+                                        plotTitle,
+                                        vmax=None,
+                                        vmin=None)
+                    except Exception as e:
+                        plt.close()
+                        print(e)
+                        if numberOfNormalPlotsToMake >= 20:
+                            pF.plotDuoPlot(EADir,
+                                           galaxy,
+                                           nFP,
+                                           dataInd,
+                                           slice,
+                                           newFileName,
+                                           plotTitle,
+                                           vmax=None,
+                                           vmin=None)
 
-            if bool(dictPlotTitles_Pair):
-                for key in dictPlotTitles_Pair.keys():
-                    dataMat1, maskMat1, newFileName1, plotTitle1, units1 = self.prepData(
-                        dictPlotTitles_Index, key, galaxy, dataInd, NAXIS3)
+                if 'pair' in plotInfo.keys():
                     dataMat2, maskMat2, newFileName2, plotTitle2, units2 = self.prepData(
-                        dictPlotTitles_Index, dictPlotTitles_Pair[key], galaxy, dataInd, NAXIS3)
-                    if dataMat1 is None or dataMat2 is None:
-                        continue
-                    slice1 = self.createSlice(dataMat1, maskMat1, units1)
+                        plotInfo['index'], plotsToMake[plotInfo['pair']]['index'], galaxy, dataInd, NAXIS3)
+
+                    if dataMat2 is None:
+                        return
+                    
                     slice2 = self.createSlice(dataMat2, maskMat2, units2)
                     pF.plotComparisonPlots(galaxy,
                                            dataInd,
                                            nFP,
                                            EADir,
                                            plotType,
-                                           newFileName1,
+                                           newFileName,
                                            newFileName2,
-                                           slice1,
+                                           slice,
                                            slice2,
                                            hex_at_Cen,
-                                           gal_at_Cen
-                                           )
+                                           gal_at_Cen)
 
-    def prepData(self, titleDict, key, galaxy, dataInd, NAXIS3):
+
+            return
+
+    def plotRaw(self, galaxy, newFileName, dataInd, plotType, slice, hex_at_Cen, gal_at_Cen, nFPraw):
+        aspectRatio = 16.0 / 13
+        height = 10
+        fig = plt.figure(figsize=(aspectRatio * height, height))
+        plt.suptitle(galaxy.PLATEIFU + " :: " + newFileName)
+        axes = plt.gca()
+        pF.spatiallyResolvedPlot(galaxy,
+                                 plotType,
+                                 newFileName,
+                                 dataInd,
+                                 slice,
+                                 hex_at_Cen,
+                                 gal_at_Cen,
+                                 None,
+                                 None,
+                                 axes)
+        # fig.tight_layout()
+        # plt.show()
+        # print(jello)
+        print("saving " + os.path.join(nFPraw,newFileName + '.png'))
+        plt.savefig(os.path.join(nFPraw,newFileName + '.png'))
+        # print(jello)
+        plt.close()
+
+    def are_there_plots_to_make(self, galaxy_filename, plotType):
+        if plotType == 'flux_elines':
+            if not galaxy_filename.startswith(plotType):
+                print("No plots of type (" + plotType +
+                      ") to make for the file " + galaxy_filename)
+                return False
+        
+        if plotType == 'indices.cs':
+            if not galaxy_filename.startswith(plotType[:7]):
+                print("No plots of type (" + plotType +
+                      ") to make for the file " + galaxy_filename)
+                return False
+
+        if galaxy_filename.endswith('Pipe3D.cube.fits.gz'):
+            print('skipping Pipe3D.cube.fits.gz')
+            return False
+        return True
+
+
+    def create_directories(self, plotType, PIPE3D_Dir, plateifu):
+        if plotType == 'requested' or plotType == 'requested2':
+            nFP = dF.assure_path_exists(os.path.join(
+                PIPE3D_Dir, plotType, plateifu))
+            nFPraw = dF.assure_path_exists(os.path.join(
+                PIPE3D_Dir, plotType, plateifu, 'RAW'))
+        else:
+            nFP = dF.assure_path_exists(os.path.join(
+                PIPE3D_Dir, plateifu, plotType))
+            nFPraw = dF.assure_path_exists(os.path.join(
+                PIPE3D_Dir, plateifu, plotType, 'RAW'))
+
+        return nFP, nFPraw
+
+
+    def prepData(self, plotIndex, rawPlotTitle, galaxy, dataInd, NAXIS3):
         if NAXIS3 == 0:
             dataMat = galaxy.myHDU[dataInd].data
             newFileName = galaxy.myFilename
         else:
-            dataMat = galaxy.myHDU[dataInd].data[titleDict[key]]
-            newFileName = key
+            dataMat = galaxy.myHDU[dataInd].data[plotIndex]
+            newFileName = rawPlotTitle
 
         maskMat = np.zeros(dataMat.shape)
         maskMat[dataMat == 0] = 1
@@ -172,11 +272,11 @@ class plotter_PIPE3D(PlotterABC):
         plotTitle = galaxy.PLATEIFU + " :: " + newFileName
 
         if not galaxy.myFilename.startswith('flux_elines') and not galaxy.myFilename.startswith('indices'):
-            if titleDict[key] > 99:
+            if plotIndex > 99:
                 units = galaxy.myHDU[dataInd].header["UNITS_" + str(99)]
             else:
                 units = galaxy.myHDU[dataInd].header["UNITS_" +
-                                                     str(titleDict[key])]
+                                                     str(plotIndex)]
             units = units.strip()
             if units == 'yr':
                 units = 'log(Age(Gyr))'
@@ -201,9 +301,9 @@ class plotter_PIPE3D(PlotterABC):
 
         return dataMat, maskMat, newFileName, plotTitle, units
 
-    def removeNonRequested(self, dictPlotTitles_Index, dictPlotTitles_Error, dictPlotTitles_Pair, requestedWithin):
-        dictKeys = copy.copy(list(dictPlotTitles_Index.keys()))
-        for key in dictKeys:
+    def removeNonRequested(self, plotsToMake, requestedWithin):
+        plotNames = copy.copy(list(plotsToMake.keys()))
+        for key in plotNames:
             flag = False
             for withinTextVec in requestedWithin:
                 currFlag = True
@@ -213,23 +313,23 @@ class plotter_PIPE3D(PlotterABC):
                 if currFlag:
                     flag = True
             if not flag:
-                del dictPlotTitles_Index[key]
-                if key in dictPlotTitles_Error.keys():
-                    del dictPlotTitles_Error[key]
-                if key in dictPlotTitles_Pair.keys():
-                    del dictPlotTitles_Pair[key]
-        return dictPlotTitles_Index, dictPlotTitles_Error, dictPlotTitles_Pair
+                del plotsToMake[key]
+        return plotsToMake
 
     def createDictionaries(self, galaxy, NAXIS3, titleHdr, dataInd):
-        dictPlotTitles_Index = {}
-        dictPlotTitles_Error = {}
-        dictPlotTitles_Pair = {}
+        plotsToMake = {}
+        # dictPlotTitles_Index = {}
+        # dictPlotTitles_Error = {}
+        # dictPlotTitles_Pair = {}
 
         for i in range(NAXIS3):
             try:
                 plotTitle = galaxy.myHDU[dataInd].header[titleHdr + str(i)]
                 plotTitle = plotTitle.strip()
-                dictPlotTitles_Index[plotTitle] = i
+                plotsToMake[plotTitle] = {
+                    'index' : i
+                }
+                # dictPlotTitles_Index[plotTitle] = i
             except VerifyError:
                 print('The header title ' + titleHdr + str(i) +
                       ' is corrupt for the file ' + galaxy.myFilename)
@@ -243,16 +343,19 @@ class plotter_PIPE3D(PlotterABC):
         pairFlagsSecondFound = [False, False]
         tempPairKey = ['', '']
 
-        for key in dictPlotTitles_Index.keys():
+        # for key in dictPlotTitles_Index.keys():
+        for key in plotsToMake.keys():
             for errorPrefix in errorPrefixes:
                 if errorPrefix in key:
                     TitleFromWhereErrorBelongs = key[len(errorPrefix):]
-                    if TitleFromWhereErrorBelongs in dictPlotTitles_Index.keys():
-                        dictPlotTitles_Error[TitleFromWhereErrorBelongs] = key
+                    if TitleFromWhereErrorBelongs in plotsToMake.keys():
+                        # dictPlotTitles_Error[TitleFromWhereErrorBelongs] = key
+                        plotsToMake[TitleFromWhereErrorBelongs]['error'] = key
                     else:
-                        for key2 in dictPlotTitles_Index.keys():
+                        for key2 in plotsToMake.keys():
                             if key != key2 and key2.endswith(TitleFromWhereErrorBelongs):
-                                dictPlotTitles_Error[key2] = key
+                                # dictPlotTitles_Error[key2] = key
+                                plotsToMake[key2]['error'] = key
                     break
 
             for i in range(len(pairSuffixes)):
@@ -262,7 +365,8 @@ class plotter_PIPE3D(PlotterABC):
                     pairFlagsFirstFound[i] = True
                 elif not pairFlagsSecondFound[i] and key.endswith(pairSuffix):
                     # print(str(i) + " " + str(pairFlagsSecondFound[i]))
-                    dictPlotTitles_Pair[tempPairKey[i]] = key
+                    # dictPlotTitles_Pair[tempPairKey[i]] = key
+                    plotsToMake[tempPairKey[i]]['pair'] = key
                     pairFlagsSecondFound[i] = True
 
-        return dictPlotTitles_Index, dictPlotTitles_Error, dictPlotTitles_Pair
+        return plotsToMake

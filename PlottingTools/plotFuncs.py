@@ -58,21 +58,81 @@ def plotQuadPlot(EADir, galaxy, nFP, dataInd, slice, newFileName, plotTitle, vma
     spatiallyResolvedPlot(galaxy, "", newFileName, dataInd,
                           slice, hex_at_Cen, gal_at_Cen, vmax, vmin, axes2)
 
-    simple = 'No'
-    if simple == 'No':
-        plotAxisCrossSections(galaxy, slice, hex_at_Cen, gal_at_Cen, axes2)
+    plotAxisCrossSections(galaxy, slice, hex_at_Cen, gal_at_Cen, axes2)
 
     # fig.tight_layout()
     try:
         # plt.show()
         # print(jello)
-        print("saving to " + os.path.join(nFP, newFileName + '.png'))
-        plt.savefig(os.path.join(nFP, newFileName + '.png'))
+        print("saving to " + os.path.join(nFP, newFileName + 'quad.png'))
+        plt.savefig(os.path.join(nFP, newFileName + 'quad.png'))
     except AttributeError:
         print("Error generating plots. Plot not saved :: "+ os.path.join(nFP, newFileName + '.png'))
     #print(jello)
     plt.close()
 
+def plotDuoPlot(EADir, galaxy, nFP, dataInd, slice, newFileName, plotTitle, plotType='', vmax=None, vmin=None):
+
+    hex_at_Cen, gal_at_Cen = fE.getCenters(
+        galaxy.myHDU, galaxy.PLATEIFU, dataInd)
+
+    # print("Masking " + str(round(float(sum(sum(maskMat)) * 100) /
+    #                              (maskMat.shape[0] * maskMat.shape[1]), 2)) + ' percent of the data matrix; ~40 percent is great data')
+
+    aspectRatio = 34.0 / 13
+    height = 19.0 / 2
+    fig = plt.figure(figsize=(height * aspectRatio, height))
+    fig.subplots_adjust(hspace=0.25)
+    # plt.figure()
+    plt.suptitle(plotTitle, fontsize=fontsize + 5, fontweight='bold')
+
+    axes1 = plt.subplot(1, 2, 1)
+    opticalImage(EADir, galaxy, dataInd, axes1)
+    # dOP.plotHexagon(axes1, plate_IFU)
+
+    axes2 = plt.subplot(1, 2, 2)
+    spatiallyResolvedPlot(galaxy, plotType, newFileName, dataInd,
+                          slice, hex_at_Cen, gal_at_Cen, vmax, vmin, axes2)
+
+    # fig.tight_layout()
+    try:
+        # plt.show()
+        # print(jello)
+        print("saving to " + os.path.join(nFP, newFileName + 'duo.png'))
+        plt.savefig(os.path.join(nFP, newFileName + 'duo.png'))
+    except AttributeError:
+        print("Error generating plots. Plot not saved :: "+ os.path.join(nFP, newFileName + '.png'))
+    #print(jello)
+    plt.close()
+
+def plotLonePlot(EADir, galaxy, nFP, dataInd, slice, newFileName, plotTitle, plotType='', vmax=None, vmin=None):
+    hex_at_Cen, gal_at_Cen = fE.getCenters(
+        galaxy.myHDU, galaxy.PLATEIFU, dataInd)
+
+    # print("Masking " + str(round(float(sum(sum(maskMat)) * 100) /
+    #                              (maskMat.shape[0] * maskMat.shape[1]), 2)) + ' percent of the data matrix; ~40 percent is great data')
+
+    aspectRatio = 34.0 / 13
+    height = 19.0 / 2
+    fig = plt.figure(figsize=(height * aspectRatio / 2, height))
+    fig.subplots_adjust(hspace=0.25)
+    # plt.figure()
+    plt.suptitle(plotTitle, fontsize=fontsize + 5, fontweight='bold')
+
+    axes1 = plt.subplot(1, 1, 1)
+    spatiallyResolvedPlot(galaxy, plotType, newFileName, dataInd,
+                          slice, hex_at_Cen, gal_at_Cen, vmax, vmin, axes1)
+
+    # fig.tight_layout()
+    try:
+        # plt.show()
+        # print(jello)
+        print("saving to " + os.path.join(nFP, newFileName + 'lone.png'))
+        plt.savefig(os.path.join(nFP, newFileName + 'lone.png'))
+    except AttributeError:
+        print("Error generating plots. Plot not saved :: "+ os.path.join(nFP, newFileName + '.png'))
+    #print(jello)
+    plt.close()
 
 def selectBoundsForColorMap(slice, vmax, vmin):
     devs = 3
@@ -86,9 +146,13 @@ def selectBoundsForColorMap(slice, vmax, vmin):
 def pickColorMap(plotType):
     if plotType == 'WHAN' or plotType.startswith('BPT'):
         cmap = mclr.ListedColormap(['cornflowerblue', 'orange', 'yellowgreen'])
+    elif plotType == 'requested':
+        cmap = CALIFAcmap.get_califa_velocity_cmap()
+    elif plotType == 'elines':
+        cmap = cm.get_cmap('plasma')
     else:
         cmap = cm.get_cmap('jet')
-    cmap = CALIFAcmap.get_califa_velocity_cmap()
+    
     # cmap = cm.get_cmap('coolwarm', 3)
     return cmap
 
@@ -205,35 +269,60 @@ def plotComparisonPlots(galaxy, dataInd, nFP, EADir, plotType, newFileName1, new
     plt.close()
 
 
-def opticalImage(EADir, galaxy, dataInd, axes):
-    # extentVec = pT.createExtentVec(plate_IFU, hdu, dataInd, Re, center=center)
-    # extentVec = pT.centerVec(extentVec)
-    imgType = ''
+def loadOpticalImage(EADir, plate_IFU):
+    basepath = os.path.join(EADir, "CAS", plate_IFU)
+    noImageFoundPath = os.path.join(EADir,"CAS", "No Image Found.png")
+    potentialImageFileNames = [
+        'Visual',
+        'Optical'
+    ]
+    potentialImageFileExtensions = [
+        'png',
+        'jpeg'
+    ]
+
     try:
-    	FileNotFoundError
+        FileNotFoundError
     except NameError:
         #py2
         FileNotFoundError = IOError
-    try:
-        visualImage = mpimg.imread(os.path.join(
-            EADir, "CAS", galaxy.PLATEIFU, 'Visual.png'))
-        imgType = 'png'
-    except FileNotFoundError:
-        try:
-            visualImage = mpimg.imread(os.path.join(
-                EADir, "CAS", galaxy.PLATEIFU, 'Optical.png'))
-            imgType = 'jpeg'
-        except FileNotFoundError:
-            visualImage = mpimg.imread(os.path.join(EADir,"CAS", "No Image Found.png"))
+    
+    for name in potentialImageFileNames:
+        for imgType in potentialImageFileExtensions:
+            try:
+                visualImage = mpimg.imread(os.path.join(basepath, name + '.' + imgType))
+                return imgType, visualImage
+            except Exception as e:
+                continue
+    print('using no image found')
+    return '', mpimg.imread(noImageFoundPath)
+
+def opticalImage(EADir, galaxy, dataInd, axes):
+    # extentVec = pT.createExtentVec(plate_IFU, hdu, dataInd, Re, center=center)
+    # extentVec = pT.centerVec(extentVec)
+    imgType, visualImage = loadOpticalImage(EADir, galaxy.PLATEIFU)
     # print(visualImage.shape)
+    scaleVec = None
+
     if imgType == 'png':
+        # 5" == 50 pixels
         scaleVec = pT.visualImageCropping(
             galaxy.PLATEIFU, visualImage.shape[:2])
+
+    if imgType == 'jpeg':
+        # 5" == 25 pixels
+        scaleVec = [75,125,75,125]
+
+    if scaleVec is not None:
         visualImage = visualImage[scaleVec[0]:scaleVec[1],
                                   scaleVec[2]:scaleVec[3]]
 
-    extentVec = [- float(visualImage.shape[0]) / 2, float(visualImage.shape[0]) / 2, -
-                 float(visualImage.shape[1]) / 2, float(visualImage.shape[1]) / 2]
+    extentVec = [
+    - float(visualImage.shape[0]) / 2,
+      float(visualImage.shape[0]) / 2,
+    - float(visualImage.shape[1]) / 2, 
+      float(visualImage.shape[1]) / 2
+    ]
 
     extentVec = np.divide(extentVec, 10)
 

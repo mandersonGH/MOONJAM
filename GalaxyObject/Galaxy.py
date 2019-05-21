@@ -21,8 +21,12 @@ class Galaxy():
 
         self.pullInfo()
 
+    def __repr__(self):
+        return 'Galaxy(plateIFU={}, Re={}, Filename={})'.format(self.PLATEIFU, self.Re, self.myFilename)
+
     def printInfo(self):
         self.myHDU.info()
+        print(self.myHDU[0].header.comments)
         for j in self.myHDU[0].header.keys():
             print(str(j) + "  ::   " + str(self.myHDU[0].header[j]))
         #print(jello)

@@ -25,6 +25,7 @@ class plotter_DAP(PlotterABC):
     def plot(self, EADir, galaxy, plotType):
         galaxy.setCenterType('GAL')
         galaxy.pullRe(EADir, self.DAPtype)
+        # print('{};{}'.format(galaxy.PLATEIFU, galaxy.Re))
         if plotType in self.potentialDefaultCubePlots:
             defaultCubePlots(EADir, galaxy, plotType, self.DAPtype)
         else:

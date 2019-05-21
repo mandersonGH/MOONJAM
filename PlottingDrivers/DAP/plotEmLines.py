@@ -4,6 +4,8 @@ Created on Sep 8, 2017
 @author: Mande
 '''
 import numpy as np
+import matplotlib.pyplot as plt
+
 import GalaxyObject.fitsExtraction as fE
 import dataCorrection as dC
 import PlottingTools.plotFuncs as pF
@@ -74,12 +76,34 @@ def plotEmLines(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP, dataInd):
 
         vmax, vmin = pickBoundsForColorBar(slice)
 #         print(jello)
-        pF.plotQuadPlot(EADir,
-                        galaxy,
-                        nFP,
-                        dataInd,
-                        slice,
-                        newFileName,
-                        plotTitle,
-                        vmax=vmax,
-                        vmin=vmin)
+        # try:
+        #     pF.plotQuadPlot(EADir,
+        #                     galaxy,
+        #                     nFP,
+        #                     dataInd,
+        #                     slice,
+        #                     newFileName,
+        #                     plotTitle,
+        #                     vmax=vmax,
+        #                     vmin=vmin)
+        # except Exception as e:
+        #     plt.close()
+        #     print(e)
+        #     pF.plotDuoPlot(EADir,
+        #                    galaxy,
+        #                    nFP,
+        #                    dataInd,
+        #                    slice,
+        #                    newFileName,
+        #                    plotTitle,
+        #                    vmax=vmax,
+        #                    vmin=vmin)
+        pF.plotLonePlot(EADir,
+                       galaxy,
+                       nFP,
+                       dataInd,
+                       slice,
+                       newFileName,
+                       plotTitle,
+                       vmax=vmax,
+                       vmin=vmin)

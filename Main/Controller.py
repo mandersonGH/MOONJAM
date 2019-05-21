@@ -26,8 +26,10 @@ class Controller:
     dictPIPE3Dfiles = eval(
         open(os.path.join(resourceFolder, "dictPIPE3Dfiles.txt")).read())
 
-    def __init__(self, args):
-        self.inputs = args
+    def __init__(self, ea_directory, data_versions, requested_plots):
+        self.ea_directory = ea_directory
+        self.data_versions = data_versions
+        self.requested_plots = requested_plots
 
     def exitProgram(self, message):
         print("Program Error - Exiting...")
@@ -36,79 +38,54 @@ class Controller:
         sys.exit()
 
     def run(self):
-        opts, EADirectory = self.obtainUserOptsInput()
-        # EADirectory - where all plots and data are saved
-        # opts - the arguments following the run command that dictate what
-        # plots the user wants to produce
-
-        if(not EADirectory or (not opts or len(opts) < 1)):
-            self.exitProgram("Not enough inputs were supplied. Please specify the type of data you would like to generate plots for (e.g. MPL4 or MPL5) and the type of plots you would like")
         print()
         timer = Stopwatch()
         timer.start()
-        fileDict = self.requiredFileSearch(opts, EADirectory)
+        fileDict = self.requiredFileSearch(self.ea_directory, self.data_versions, self.requested_plots)
         if not fileDict:
+            timer.stop()
             self.exitProgram(
-                r"No files were found in the directory supplied. The program will now close. Avoiding ending the directory with the character '\' and put the entire directory in quotes if there are any spaces in the path")
-            timer.stop()
-        else:
-            print("")
-            print('The program found this many .fits and .fits.gz files:  ' +
-                  str(len(fileDict.items())))
-            print("")
-            self.makePLOTS(fileDict, opts, EADirectory)
-            timer.stop()
-            timer.reportDuration()
+                r"No files were found in the directory supplied to create the plots you requested. The program will now close. Avoiding ending the directory with the character '\' and put the entire directory in quotes if there are any spaces in the path")
+        print("")
+        print('The program found this many .fits and .fits.gz files:  ' +
+              str(len(fileDict.items())))
+        print("")
+        self.makePLOTS(fileDict, self.data_versions, self.ea_directory)
+        timer.stop()
+        timer.reportDuration()
 
-    def obtainUserOptsInput(self):
-        opts = []
-        try:
-            EADirectory = self.inputs[1]
-            del self.inputs[:2]
-            for user_input in self.inputs:
-                opts.append(user_input)
-        except IndexError:
-            self.exitProgram("No directory and/or plot type arguments supplied. Please read documentation of what arguments need to be supplied")
-        except ValueError:
-            # opts = initiateUserInterface()
-            print("no user interface built")
-            return None, None
-
-        opts = [opt.lower() for opt in opts]
-        return opts, os.path.abspath(EADirectory)
-
-    def requiredFileSearch(self, opts, EADirectory):
+    def requiredFileSearch(self, EADirectory, data_versions, requested_plots):
         fileDict = defaultdict(list)
         print("")
         print('The program will search this directory for .fits and .fits.gz files:')
-        if 'mpl4' in opts:
+        if 'mpl4' in data_versions:
             print('     ' +     os.path.join(EADirectory, "MPL-4", "DATA", "DAP"))
-            fileDict.update(self.makeFilePlotDict(
-                opts,           os.path.join(EADirectory, "MPL-4", "DATA", "DAP"), self.dictMPL4files))
-            if 'pipe3d' in opts:
+            fileDict.update(self.makeFilePlotDict(requested_plots,
+                                os.path.join(EADirectory, "MPL-4", "DATA", "DAP"), self.dictMPL4files))
+            if 'pipe3d' in data_versions:
                 print('     ' + os.path.join(EADirectory, "MPL-4", "DATA", "PIPE3D"))
-                fileDict.update(self.makeFilePlotDict(
-                    opts,       os.path.join(EADirectory, "MPL-4", "DATA", "PIPE3D"), self.dictPIPE3Dfiles))
-        if 'mpl5' in opts:
+                fileDict.update(self.makeFilePlotDict(requested_plots,
+                                os.path.join(EADirectory, "MPL-4", "DATA", "PIPE3D"), self.dictPIPE3Dfiles))
+        if 'mpl5' in data_versions:
             print('     ' +     os.path.join(EADirectory, "MPL-5", "DATA", "DAP"))
-            fileDict.update(self.makeFilePlotDict(
-                opts,           os.path.join(EADirectory, "MPL-5", "DATA", "DAP"), self.dictMPL5files))
-            if 'pipe3d' in opts:
+            fileDict.update(self.makeFilePlotDict(requested_plots,
+                                os.path.join(EADirectory, "MPL-5", "DATA", "DAP"), self.dictMPL5files))
+            if 'pipe3d' in data_versions:
                 print('     ' + os.path.join(EADirectory, "MPL-5", "DATA", "PIPE3D"))
-                fileDict.update(self.makeFilePlotDict(
-                    opts,       os.path.join(EADirectory, "MPL-5", "DATA", "PIPE3D"), self.dictPIPE3Dfiles))
+                fileDict.update(self.makeFilePlotDict(requested_plots,
+                                os.path.join(EADirectory, "MPL-5", "DATA", "PIPE3D"), self.dictPIPE3Dfiles))
         print("")
         return fileDict
 
-    def makeFilePlotDict(self, opts, EADirectory, dictFileTypes):
+    def makeFilePlotDict(self, requested_plots, EADirectory, dictFileTypes):
         filePlotDict = defaultdict(list)
         print("These are the types of plots you can create for this data source")
-        for key in dictFileTypes.keys():
-            print("   -" + key)
-        for key in dictFileTypes.keys():
-            if key in opts:
-                print("You requested: " + key)
-                fileType = dictFileTypes[key]
+        for plot_type in dictFileTypes.keys():
+            print("   -" + plot_type)
+        for plot_type in dictFileTypes.keys():
+            if plot_type in requested_plots:
+                print("You requested: " + plot_type)
+                fileType = dictFileTypes[plot_type]
                 fileList = dF.locate(fileType, True, rootD=EADirectory)
                 fileList_gz = dF.locate(
                     fileType + '.gz', True, rootD=EADirectory)
@@ -116,22 +93,22 @@ class Controller:
                     x for x in fileList_gz if x[:-3] not in fileList]
                 fileList = np.append(fileList, fileList_gz)
                 for file in fileList:
-                    filePlotDict[file].append(key)
+                    filePlotDict[file].append(plot_type)
         return filePlotDict
 
-    def makePLOTS(self, fileDict, opts, EADirectory):
+    def makePLOTS(self, fileDict, data_versions, EADirectory):
         for fileItemPair in fileDict.items():
             file = fileItemPair[0]
-            print("")
-            print('File:')
-            print('     ' + file)
-            print('Plots to create:')
-            print('     ' + str(fileItemPair[1]))
-            print("")
+            plotsToBeCreated = fileItemPair[1]
+            # print("")
+            # print('File:')
+            # print('     ' + file)
+            # print('Plots to create:')
+            # print('     ' + str(plotsToBeCreated))
+            # print("")
 
             galaxy = Galaxy(file, fits.open(file))
-            plotsToBeCreated = fileItemPair[1]
             myPlottingController = plottingController(
-                EADirectory, galaxy, plotsToBeCreated, opts)
+                EADirectory, galaxy, plotsToBeCreated, data_versions)
             myPlottingController.run()
             galaxy.close()
