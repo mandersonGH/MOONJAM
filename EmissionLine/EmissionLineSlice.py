@@ -7,20 +7,14 @@ Created on Sep 8, 2017
 
 class EmissionLineSlice(object):
 
-    def setName(self, name):
+    def __init__(self, galaxy, dataIndex, name, fancyName, units):
         self.myName = name
-
-    def setFancyName(self, fancyName):
         self.myFancyName = fancyName
-
-    def setData(self, data):
-        self.myData = data
-
-    def setMask(self, mask):
-        self.myMask = mask
-
-    def setError(self, error):
-        self.myError = error
-
-    def setUnits(self, units):
+        self.myGalaxysPlateIfu = galaxy.PLATEIFU
+        self.myData = galaxy.myDataCube[dataIndex]
+        self.myMask = galaxy.myMaskCube[dataIndex]
+        self.myError = galaxy.myErrorCube[dataIndex]
         self.myUnits = units
+
+    def __str__(self):
+        return self.myGalaxysPlateIfu + " :: " + self.myName

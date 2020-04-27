@@ -9,6 +9,7 @@ import os
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib.colors as mclr
+from collections import namedtuple
 
 import PlottingTools.plottingTools as pT
 import PlottingTools.plotFuncs as pF
@@ -29,10 +30,8 @@ def plotRatioPlots(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP):
     xValues, yValues, disValues, labelMat, mask, labels, counts = extractData(
         galaxy.myHDU, plotType, galaxy.Re, emLineInd, dataInd)
 
-    slice = EmissionLineSlice()
-    slice.setData(labelMat)
-    slice.setMask(mask)
-    slice.setUnits('Some units')
+    DuckSlice = namedtuple("DuckSlice", ["myData", "myMask"])
+    slice = DuckSlice(labelMat, mask)
 
     # print(counts)
     # if plotType.startswith('BPT'):
@@ -43,14 +42,14 @@ def plotRatioPlots(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP):
     # for i in range(len(labelVec)):
     #     print(labelVec[i] + ":  " + str(round(counts[i + 1] / counts[0] * 100, 2)) + '%')
 
-    print("{},{},{},{},{}".format(
-        galaxy.PLATEIFU,
-        plotType,
-        str(round(counts[1] / counts[0] * 100, 2)) + '%',
-        str(round(counts[2] / counts[0] * 100, 2)) + '%',
-        str(round(counts[3] / counts[0] * 100, 2)) + '%'
-    ))
-    return
+    # print("{},{},{},{},{}".format(
+    #     galaxy.PLATEIFU,
+    #     plotType,
+    #     str(round(counts[1] / counts[0] * 100, 2)) + '%',
+    #     str(round(counts[2] / counts[0] * 100, 2)) + '%',
+    #     str(round(counts[3] / counts[0] * 100, 2)) + '%'
+    # ))
+    # return
 
     hex_at_Cen, gal_at_Cen = pT.getCenters(
         galaxy.myHDU, galaxy.PLATEIFU, dataInd)
@@ -77,12 +76,12 @@ def plotRatioPlots(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP):
     axes3 = plt.subplot(1, 2, 2)
     pF.spatiallyResolvedPlot(galaxy, plotType, plotType, dataInd,
                              slice, hex_at_Cen, gal_at_Cen, vmax, vmin, axes3)
-    dOP.addReCircles(axes3, re_colors)
+    dOP.addReCircles(axes3, ['k'] * 4)
     fig.tight_layout()
     # plt.show()
     # print(jello)
     plt.savefig(os.path.join(nFP, galaxy.PLATEIFU + '_' +
-                plotType + '_NO_IM_colored_circles.png'), bbox_inches='tight')
+                plotType + '_NO_IM_20200426.png'), bbox_inches='tight')
     # print(jello)
     plt.close()
 
@@ -345,10 +344,13 @@ def ratioAxes(plotType, emLineFancy, x, y, d, labels, axes):
     else:
         yDivideByStr = '/' + emLineFancy[yBotLbl]
 
-    plt.xlabel("log " + emLineFancy[xTopLbl] +
-               xDivideByStr, fontsize=pF.fontsize)
-    plt.ylabel("log " + emLineFancy[yTopLbl] +
-               yDivideByStr, fontsize=pF.fontsize)
+    xLbl = "log " + emLineFancy[xTopLbl] + xDivideByStr
+    yLbl = "log " + emLineFancy[yTopLbl] + yDivideByStr
+    if plotType == 'WHAN' and yTopLbl == 'Ha-6564':
+        yLbl = "log EW " + emLineFancy[yTopLbl] + yDivideByStr
+
+    plt.xlabel(xLbl, fontsize=pF.fontsize)
+    plt.ylabel(yLbl, fontsize=pF.fontsize)
 
     annotationSize = 27
 
