@@ -102,3 +102,10 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+
+.dropbox
+desktop.ini
+__pycache__/
+__init__.py
+*.pyc
