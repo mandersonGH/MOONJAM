@@ -26,9 +26,8 @@ class Galaxy():
 
     def printInfo(self):
         self.myHDU.info()
-        print(self.myHDU[0].header.comments)
         for j in self.myHDU[0].header.keys():
-            print(str(j) + "  ::   " + str(self.myHDU[0].header[j]))
+            print(str(self.myHDU[0].header.comments[j]) + " (" + str(j) + ")   =   " + str(self.myHDU[0].header[j]))
         #print(jello)
 
     def pullInfo(self):
