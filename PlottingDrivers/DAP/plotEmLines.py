@@ -9,8 +9,81 @@ import matplotlib.pyplot as plt
 import GalaxyObject.fitsExtraction as fE
 import dataCorrection as dC
 import PlottingTools.plotFuncs as pF
+import Utilities.mathFuncs as mF
 from EmissionLine import EmissionLineSlice
 
+def plotEmLines(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP, dataInd):
+
+    units = '$' + galaxy.myHDU[dataInd].header['BUNIT'] + '$'
+    # galaxy.printInfo()
+    hex_at_Cen, gal_at_Cen = fE.getCenters(
+        galaxy.myHDU, galaxy.PLATEIFU, dataInd)
+
+    print("plotEmLines("+galaxy.PLATEIFU+")")
+
+    # cycle through 11 chosen wavelengths
+    for j in emLineInd.keys():
+        # print(plotType + ": " + j)
+
+        slice = EmissionLineSlice.EmissionLineSlice(galaxy, emLineInd[j], j, emLineFancy[j], units)
+
+        ############ data Correction #############
+
+        # dC.printDataInfo(dataMat)
+
+        ############ action #############
+
+        # average = get_average(galaxy, slice)
+        # print(galaxy.PLATEIFU, slice.myName, average)
+
+        actuallyPlot(EADir, galaxy, plotType, nFP, dataInd, slice)
+
+def get_average(galaxy, slice):
+    masked_data = np.ma.array(slice.myData, mask=slice.myMask)
+    # masked_err = np.ma.array(slice.myError, mask=slice.myMask)
+    average = np.mean(masked_data)
+    return average
+
+
+def actuallyPlot(EADir, galaxy, plotType, nFP, dataInd, slice):
+    newFileName = galaxy.PLATEIFU + '_' + plotType + \
+            '_' + slice.myName
+
+    plotTitle = galaxy.PLATEIFU + ' :: ' + \
+        plotType + ' :: ' + slice.myFancyName
+    vmax, vmin = pickBoundsForColorBar(slice)
+#         print(jello)
+    # try:
+    #     pF.plotQuadPlot(EADir,
+    #                     galaxy,
+    #                     nFP,
+    #                     dataInd,
+    #                     slice,
+    #                     newFileName,
+    #                     plotTitle,
+    #                     vmax=vmax,
+    #                     vmin=vmin)
+    # except Exception as e:
+    #     plt.close()
+    #     print(e)
+    #     pF.plotDuoPlot(EADir,
+    #                    galaxy,
+    #                    nFP,
+    #                    dataInd,
+    #                    slice,
+    #                    newFileName,
+    #                    plotTitle,
+    #                    vmax=vmax,
+    #                    vmin=vmin)
+    pF.plotLonePlot(EADir,
+                   galaxy,
+                   nFP,
+                   dataInd,
+                   slice,
+                   newFileName,
+                   plotTitle,
+                   vmax=vmax,
+                   vmin=vmin)
 
 def pickBoundsForColorBar(slice):
     try:
@@ -42,68 +115,3 @@ def pickBoundsForColorBar(slice):
 # else:
 #     vmin = dC.pickVMIN(sliceMat, 1)
     return vmax, vmin
-
-
-def plotEmLines(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP, dataInd):
-
-    units = '$' + galaxy.myHDU[dataInd].header['BUNIT'] + '$'
-#     galaxy.myHDU.info()
-#     for j in galaxy.myHDU[dataInd].header.keys():
-#         print(str(j) + "  ::   " + str(galaxy.myHDU[dataInd].header[j]))
-#     #galaxy.printInfo()
-
-    # cycle through 11 chosen wavelengths
-    for j in emLineInd.keys():
-        # print(lineType + ": " + j)
-
-        newFileName = galaxy.PLATEIFU + '_' + plotType + \
-            '_' + j
-
-        plotTitle = galaxy.PLATEIFU + ' :: ' + \
-            plotType + ' :: ' + emLineFancy[j]
-
-        slice = EmissionLineSlice.EmissionLineSlice()
-        slice.setName(emLineInd[j])
-        slice.setFancyName(emLineFancy[j])
-        slice.setData(galaxy.myDataCube[emLineInd[j]])
-        slice.setError(galaxy.myErrorCube[emLineInd[j]])
-        slice.setMask(galaxy.myMaskCube[emLineInd[j]])
-        slice.setUnits(units)
-
-        ############ data Correction #############
-
-        # dC.printDataInfo(dataMat)
-
-        vmax, vmin = pickBoundsForColorBar(slice)
-#         print(jello)
-        # try:
-        #     pF.plotQuadPlot(EADir,
-        #                     galaxy,
-        #                     nFP,
-        #                     dataInd,
-        #                     slice,
-        #                     newFileName,
-        #                     plotTitle,
-        #                     vmax=vmax,
-        #                     vmin=vmin)
-        # except Exception as e:
-        #     plt.close()
-        #     print(e)
-        #     pF.plotDuoPlot(EADir,
-        #                    galaxy,
-        #                    nFP,
-        #                    dataInd,
-        #                    slice,
-        #                    newFileName,
-        #                    plotTitle,
-        #                    vmax=vmax,
-        #                    vmin=vmin)
-        pF.plotLonePlot(EADir,
-                       galaxy,
-                       nFP,
-                       dataInd,
-                       slice,
-                       newFileName,
-                       plotTitle,
-                       vmax=vmax,
-                       vmin=vmin)

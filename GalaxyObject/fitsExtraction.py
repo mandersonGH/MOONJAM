@@ -87,6 +87,7 @@ def extractDataFromDrpall(EADir, DAPtype, plate_IFU):
 
 def extractReColFromDrpall(EADir, DAPtype):
     drpall = fits.open(getDrpallFilepath(EADir, DAPtype))
+    # print(drpall[1].header)
     ReCol = None
     for i in range(1, len(drpall[1].data[0]) + 1):
         # print(str(drpall[1].header['TTYPE' + str(i)]))

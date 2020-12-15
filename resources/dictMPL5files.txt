@@ -1,5 +1,16 @@
-{'bpt': 'MAPS-SPX-GAU-MILESHC.fits',
-'whan': 'MAPS-SPX-GAU-MILESHC.fits',
-'emlines_gflux': 'MAPS-SPX-GAU-MILESHC.fits',
-'emlines_ew': 'MAPS-SPX-GAU-MILESHC.fits',
-'respectra': 'LOGCUBE-HYB10-GAU-MILESHC.fits'}
+{
+    # /sas/mangawork/manga/spectro/analysis/MPL-5/SPX-GAU-MILESHC
+    'bpt': 'MAPS-SPX-GAU-MILESHC.fits',
+
+    # /sas/mangawork/manga/spectro/analysis/MPL-5/SPX-GAU-MILESHC
+    'whan': 'MAPS-SPX-GAU-MILESHC.fits',
+
+    # /sas/mangawork/manga/spectro/analysis/MPL-5/SPX-GAU-MILESHC
+    'emlines_gflux': 'MAPS-SPX-GAU-MILESHC.fits',
+
+    # /sas/mangawork/manga/spectro/analysis/MPL-5/SPX-GAU-MILESHC
+    'emlines_ew': 'MAPS-SPX-GAU-MILESHC.fits',
+
+    # /sas/dr16/manga/spectro/analysis/v2_4_3/2.2.1/HYB10-GAU-MILESHC
+    'respectra': 'LOGCUBE-HYB10-GAU-MILESHC.fits',
+}

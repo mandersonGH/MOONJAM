@@ -23,9 +23,8 @@ np.seterr(divide='ignore', invalid='ignore')
 re_colors = ['olive', 'tomato', 'darkturquoise', 'purple']
 
 def plotRatioPlots(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP):
+    print("plotRatioPlots("+galaxy.PLATEIFU+")")
     dataInd = 1
-
-    # print(galaxy)
 
     xValues, yValues, disValues, labelMat, mask, labels, counts = extractData(
         galaxy.myHDU, plotType, galaxy.Re, emLineInd, dataInd)
@@ -63,6 +62,8 @@ def plotRatioPlots(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP):
     axes_width = 9.66
     axes_height = 8
 
+    save_as_eps = True
+
     fig = plt.figure(figsize=(axes_width * num_axes, axes_height))
     # plt.suptitle(plotType + ' Analysis :: ' + plate_IFU, fontsize=17)
 
@@ -77,11 +78,18 @@ def plotRatioPlots(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP):
     pF.spatiallyResolvedPlot(galaxy, plotType, plotType, dataInd,
                              slice, hex_at_Cen, gal_at_Cen, vmax, vmin, axes3)
     dOP.addReCircles(axes3, ['k'] * 4)
+    if save_as_eps:
+        axes3.set_rasterized(True)
     fig.tight_layout()
     # plt.show()
     # print(jello)
-    plt.savefig(os.path.join(nFP, galaxy.PLATEIFU + '_' +
-                plotType + '_NO_IM_20200426.png'), bbox_inches='tight')
+    if save_as_eps:
+        plt.savefig(os.path.join(nFP, galaxy.PLATEIFU + '_' +
+            plotType + '_NO_IM.eps'), bbox_inches='tight', format='eps')
+    else:
+        plt.savefig(os.path.join(nFP, galaxy.PLATEIFU + '_' +
+            plotType + '_NO_IM.png'), bbox_inches='tight', format='png')
+    
     # print(jello)
     plt.close()
 

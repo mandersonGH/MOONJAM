@@ -46,7 +46,7 @@ def plotHexagon(axes, plate_IFU, scale=1):
         radius=size,
         orientation=(np.pi / 180) * 30,  # rotated 30 degrees [in radians]
         facecolor='none',
-        edgecolor='darkgrey',
+        edgecolor='magenta',# edgecolor='darkgrey',
         lw=2
     ))
 

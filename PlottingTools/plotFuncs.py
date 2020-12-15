@@ -119,7 +119,11 @@ def plotLonePlot(EADir, galaxy, nFP, dataInd, slice, newFileName, plotTitle, plo
     # plt.figure()
     plt.suptitle(plotTitle, fontsize=fontsize + 5, fontweight='bold')
 
+    is_eps = True
+
     axes1 = plt.subplot(1, 1, 1)
+    if is_eps:
+        axes1.set_rasterized(True)
     spatiallyResolvedPlot(galaxy, plotType, newFileName, dataInd,
                           slice, hex_at_Cen, gal_at_Cen, vmax, vmin, axes1)
 
@@ -127,8 +131,11 @@ def plotLonePlot(EADir, galaxy, nFP, dataInd, slice, newFileName, plotTitle, plo
     try:
         # plt.show()
         # print(jello)
-        print("saving to " + os.path.join(nFP, newFileName + 'lone.png'))
-        plt.savefig(os.path.join(nFP, newFileName + 'lone.png'))
+        # print("saving to " + os.path.join(nFP, newFileName + 'lone.png'))
+        if is_eps:
+            plt.savefig(os.path.join(nFP, newFileName + 'lone.eps'), format='eps')
+        else:
+            plt.savefig(os.path.join(nFP, newFileName + 'lone.png'))
     except AttributeError:
         print("Error generating plots. Plot not saved :: "+ os.path.join(nFP, newFileName + '.png'))
     #print(jello)

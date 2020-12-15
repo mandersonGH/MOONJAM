@@ -8,6 +8,8 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 
+import csv
+
 import Utilities.helperFuncs as hF
 import Utilities.mathFuncs as mF
 import Utilities.direcFuncs as dF
@@ -18,7 +20,7 @@ from PlottingTools.plotFuncs import CAS_spectra
 re_colors = ['olive', 'tomato', 'darkturquoise']
 
 def plotReSpectra(EADir, galaxy, DAPtype, plotType, dataInd, dataCube, waveVec):
-    print( galaxy.PLATEIFU)
+    print("plotReSpectra("+galaxy.PLATEIFU+")")
     nFP = dF.assure_path_exists(os.path.join(
         EADir, DAPtype, 'PLOTS', 'DAP', galaxy.PLATEIFU, 'ReSpectra'))
     # unitsY = hdu[0].header['BUNIT']
@@ -38,6 +40,8 @@ def plotReSpectra(EADir, galaxy, DAPtype, plotType, dataInd, dataCube, waveVec):
     ]
 
     normed = True
+    eps = True
+
     if normed:
         unitsY = '$f_{\\lambda}$ / $f_{5500 nm}$'
     else:
@@ -48,10 +52,12 @@ def plotReSpectra(EADir, galaxy, DAPtype, plotType, dataInd, dataCube, waveVec):
     ReSpectraValues, dictRadiiSpaxNum = createRadiiRangesBuckets(
         waveVec, dataCube, radii_buckets, refPnt, galaxy.Re, normWavelength=5500 if normed else None)   
 
+    # write_csv(nFP, galaxy.PLATEIFU, waveVec, radii_buckets, ReSpectraValues)
+
     # plotSideBySideSpectra(galaxy.PLATEIFU, radii_buckets, waveVec, ReSpectraValues, dictRadiiSpaxNum,
-    #                    unitsX, unitsY, EADir, nFP, normed)
+    #                    unitsX, unitsY, EADir, nFP, normed, eps)
     plotSharingAxesSpectra(galaxy.PLATEIFU, radii_buckets, waveVec, ReSpectraValues, dictRadiiSpaxNum,
-                       unitsX, unitsY, EADir, nFP, normed)
+                       unitsX, unitsY, EADir, nFP, normed, eps)
     # print(jello)
 
 def normalizeSpectra(waveVec, ReSpectra, wavelength):
@@ -148,7 +154,7 @@ def createRadiiRangesBuckets(waveVec, dataCube, radiiRangeBounds, refPnt, Re, no
                 waveVec, ReSpectra[k], normWavelength)
     return ReSpectra, dictRadiiSpaxNum
 
-def plotSideBySideSpectra(plate_IFU, radii, waveVec, ReSpectra, dictRadiiSpaxNum, unitsX, unitsY, EADir, nFP, normed):
+def plotSideBySideSpectra(plate_IFU, radii, waveVec, ReSpectra, dictRadiiSpaxNum, unitsX, unitsY, EADir, nFP, normed, eps):
     fontsize = 30
     legVec = []
     aspectRatio = 4
@@ -179,12 +185,12 @@ def plotSideBySideSpectra(plate_IFU, radii, waveVec, ReSpectra, dictRadiiSpaxNum
     fig.tight_layout()
     # plt.show()
     # print(jello)
-    plt.savefig(getPicFilename(nFP, plate_IFU, 'SideBySide', normed), bbox_inches='tight')
+    plt.savefig(getPicFilename(nFP, plate_IFU, 'SideBySide', normed, '', eps), bbox_inches='tight', format=('png' if not eps else 'eps'))
     # print(jello)
     plt.close()
 
-def plotSharingAxesSpectra(plate_IFU, radii, waveVec, ReSpectra, dictRadiiSpaxNum, unitsX, unitsY, EADir, nFP, normed):
-    thin = True
+def plotSharingAxesSpectra(plate_IFU, radii, waveVec, ReSpectra, dictRadiiSpaxNum, unitsX, unitsY, EADir, nFP, normed, eps):
+    thin = False
     fontsize = 25
     legVec = []
     aspectRatio = 23.0 / (7 if not thin else 14)
@@ -227,9 +233,26 @@ def plotSharingAxesSpectra(plate_IFU, radii, waveVec, ReSpectra, dictRadiiSpaxNu
     fig.tight_layout()
     # plt.show()
     # print(jello)
-    plt.savefig(getPicFilename(nFP, plate_IFU, 'Sharing', normed, '' if not thin else '_Thin'), bbox_inches='tight')
+    plt.savefig(getPicFilename(nFP, plate_IFU, 'Sharing', normed, '' if not thin else '_Thin', eps), bbox_inches='tight', format=('png' if not eps else 'eps'))
     # print(jello)
     plt.close()
 
-def getPicFilename(nFP, plate_IFU, pType, normed, suffix):
-    return os.path.join(nFP, plate_IFU + '_' + pType + '_' + ('' if normed else 'Not') + 'Normed_ReSpectra'+suffix+'.png')
+def getPicFilename(nFP, plate_IFU, pType, normed, suffix, eps):
+    return os.path.join(nFP, plate_IFU + '_' + pType + '_' + ('' if normed else 'Not') + 'Normed_ReSpectra'+suffix+ ('.png' if not eps else '.eps'))
+
+def write_csv(nFP, plateIFU, waveVec, radii, dataColumns):
+    one_file = False
+    if one_file:
+        column_titles = ['Wavelengths'] + ['From '+str(radii[i][0] if i is not 0 else 0) +'$R_e$ to ' + str(radii[i][1]) + '$R_e$' for i in range(len(radii))]
+        with open(plateIFU + '.csv', 'wb') as csvfile:
+            filewriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            filewriter.writerow(column_titles)
+            for i in range(len(waveVec)):
+                filewriter.writerow([waveVec[i], dataColumns[0][i], dataColumns[1][i], dataColumns[2][i]])
+    else:
+        for i in range(len(radii)):
+            file_name = plateIFU + '_Re' + str(i) + str(i+1) + '.txt'
+            with open(file_name, 'w') as f:
+                for j in range(len(waveVec)):
+                    row = str(waveVec[j]) + '\t' + str(dataColumns[i][j]) + '\n'
+                    f.write(row)
