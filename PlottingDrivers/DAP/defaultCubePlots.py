@@ -58,7 +58,7 @@ def extractTypesOfBPT(DAPtype):
     if DAPtype == 'MPL-4':
         typesOfBPT = ['']
     elif DAPtype == 'MPL-5':
-        typesOfBPT = ['[NII]', '[SII]']
+        typesOfBPT = ['[NII]', '[SII]', '[OI]']
     return typesOfBPT
 
 

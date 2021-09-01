@@ -22,6 +22,20 @@ np.seterr(divide='ignore', invalid='ignore')
 
 re_colors = ['olive', 'tomato', 'darkturquoise', 'purple']
 
+"""
+BPT Diagrams
+
+for diagram 1: [OII]/H-beta on the y and [NII]/H-alpha on the x
+    Note: included "Composite" section
+for diagram 2: [OII]/H-beta on the y and [SII]/ H-alpha on the x
+for diagram 3: [OII]/H-beta on the y and [OI] / H-alpha on the x
+
+we have multiple wavelengths for some of these emission lines. Use:
+[NII] = 6585
+[OI] = 6302
+[SII] = THE SUM OF both 6732 and 6718. ( I dunno why though. Just one of those stupid things.)
+"""
+
 def plotRatioPlots(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP):
     print("plotRatioPlots("+galaxy.PLATEIFU+")")
     dataInd = 1
@@ -192,7 +206,7 @@ def getAllIndices(hdu, plotType):
     elif plotType.startswith('BPT'):
 
         if plotType == 'BPT' or plotType.endswith('[NII]'):
-            xTop = 'NII-6549'
+            xTop = 'NII-6585' # old 6549
             xTopDataInd = 'EMLINE_GFLUX'
             xTopErrInd = 'EMLINE_GFLUX_IVAR'
             xTopMaskInd = hdu['EMLINE_GFLUX'].header['QUALDATA']
@@ -200,6 +214,11 @@ def getAllIndices(hdu, plotType):
         elif plotType.endswith('[SII]'):
             #### Not available in MPL4 #######
             xTop = 'SII-6718'
+            xTopDataInd = 'EMLINE_GFLUX'
+            xTopErrInd = 'EMLINE_GFLUX_IVAR'
+            xTopMaskInd = hdu['EMLINE_GFLUX'].header['QUALDATA']
+        elif plotType.endswith('[OI]'):
+            xTop = 'OI-6302'
             xTopDataInd = 'EMLINE_GFLUX'
             xTopErrInd = 'EMLINE_GFLUX_IVAR'
             xTopMaskInd = hdu['EMLINE_GFLUX'].header['QUALDATA']
@@ -243,6 +262,10 @@ def calculate_AxisMats(hdu, emLineInd, Top, Bot, TopMatInd, BotMatInd, Mat_type)
 
 
 def processRatioData(plotType, xMat, yMat, dMat, mask):
+    """
+    Creates scatter array for plotting
+    Decides what designations each data point falls within
+    """
     x = []
     y = []
     d = []
@@ -283,6 +306,67 @@ def processRatioData(plotType, xMat, yMat, dMat, mask):
     return x, y, d, labelMat, counts
 
 
+def createBptDesignationLines(plotType, xmin):
+    """
+    Creates arrays for each designation line in BPT diagrams 
+    """
+    x1 = []
+    x2 = []
+    x3 = [] # [NII] only
+    y1 = []
+    y2 = []
+    y3 = [] # [N11] only
+
+    for i in np.linspace(xmin, 2, 100):
+
+        if plotType.endswith('[NII]'):
+
+            if(i < 0.05):
+                # between:
+                #   lower  x's: SF and Seyfert
+                #   higher x's: SF and composite
+                x1.append(i)
+                y1.append(0.61 / (i - 0.05) + 1.3)
+
+            if(i > -0.26):
+                # between LINER and Seyfert
+                x2.append(i)
+                y2.append(1.89 * i + 0.76) # TODO fix
+
+            if(-1.2805 < i and i < 0.47):
+                # between Composite and LINER
+                x3.append(i)
+                y3.append(0.61 / (i - 0.47) + 1.19)
+
+        elif plotType.endswith('[SII]'):
+
+            if(i < 0.32):
+                # between:
+                #   lower  x's: SF and Seyfert
+                #   higher x's: SF and LINER
+                x1.append(i)
+                y1.append(0.72 / (i - 0.32) + 1.3)
+
+            if(i > -0.33):
+                # between LINER and Seyfert
+                x2.append(i)
+                y2.append(1.89 * i + 0.76)
+
+        elif plotType.endswith('[OI]'):
+
+            if(-2 < i and i < -0.6):
+                # between:
+                #   lower  x's: SF and Seyfert
+                #   higher x's: SF and LINER
+                x1.append(i)
+                y1.append(0.73 / (i + 0.59) + 1.33)
+
+            if(i > -1.14646): # 46 repeating
+                # between LINER and Seyfert
+                x2.append(i)
+                y2.append(1.18 * i + 1.3)
+    return x1, x2, x3, y1, y2, y3
+
 def ratioAxes(plotType, emLineFancy, x, y, d, labels, axes):
     cmap = mclr.ListedColormap(re_colors)
     plt.scatter(x, y, c=d, s=20, lw=0.25, cmap=cmap, vmin=0, vmax=4)
@@ -305,20 +389,7 @@ def ratioAxes(plotType, emLineFancy, x, y, d, labels, axes):
         limits, [xmin, xmax, ymin, ymax], strict=True)
 
     if plotType.startswith('BPT'):
-        # for demarkations
-        x1 = []
-        x2 = []
-        y1 = []
-        y2 = []
-        c = np.linspace(xmin, 2, 100)
-
-        for i in c:
-            if(i < 0.05):
-                x1.append(i)
-                y1.append(0.61 / (i - 0.05) + 1.3)
-            if(-1.2805 < i and i < .47):
-                x2.append(i)
-                y2.append(0.61 / (i - 0.47) + 1.19)
+        x1, x2, x3, y1, y2, y3 = createBptDesignationLines(plotType, xmin)
     elif plotType == 'WHAN':
         if ymax < 1:
             ymax = 1
@@ -368,10 +439,14 @@ def ratioAxes(plotType, emLineFancy, x, y, d, labels, axes):
         axes.annotate('Sy', xy=(0.1, 0.85), xytext=(0.1, 0.85), textcoords='axes fraction',
                       color='orange', fontsize=annotationSize, weight='bold')
 
-        y_lastAnno = ymin + (ymax - ymin) * 0.1
-        x_lastAnno = x1[mF.findIndex(y1, y_lastAnno)] + 0.05
-        axes.annotate('Inter', xy=(x_lastAnno, y_lastAnno),
-                      color='yellowgreen', fontsize=annotationSize, weight='bold')
+        axes.annotate('LINER', xy=(0.3, 0.65),
+                          color='green', fontsize=annotationSize, weight='bold')
+
+        if plotType.endswith('[NII]'):
+            y_lastAnno = ymin + (ymax - ymin) * 0.1
+            x_lastAnno = x1[mF.findIndex(y1, y_lastAnno)] + 0.05
+            axes.annotate('Composite', xy=(x_lastAnno, y_lastAnno),
+                          color='yellowgreen', fontsize=annotationSize, weight='bold')
     elif plotType == 'WHAN':
         axes.annotate('SF', xy=(0.1, 0.9), xytext=(0.1, 0.9), textcoords='axes fraction',
                       color='cornflowerblue', fontsize=annotationSize, weight='bold')
@@ -381,8 +456,12 @@ def ratioAxes(plotType, emLineFancy, x, y, d, labels, axes):
                       color='yellowgreen', fontsize=annotationSize, weight='bold')
 
     plt.plot(x1, y1, 'k', lw=2.5)
-    plt.plot(x2, y2, '--k', lw=2.5)
+    plt.plot(x2, y2, 'k', lw=2.5)
+    if plotType.endswith("[NII]"):
+        plt.plot(x3, y3, 'k', lw=2.5)
     plt.xticks(fontsize=pF.fontsize)
     plt.yticks(fontsize=pF.fontsize)
     axes.set_xlim([xmin, xmax])
     axes.set_ylim([ymin, ymax])
+    # plt.show()
+    # print(jello)
