@@ -152,7 +152,7 @@ def selectBoundsForColorMap(slice, vmax, vmin):
 
 def pickColorMap(plotType):
     if plotType == 'WHAN' or plotType.startswith('BPT'):
-        cmap = mclr.ListedColormap(['cornflowerblue', 'orange', 'yellowgreen'])
+        cmap = mclr.ListedColormap(['cornflowerblue', 'orange', 'yellowgreen', 'red'])
     elif plotType == 'requested':
         cmap = CALIFAcmap.get_califa_velocity_cmap()
     elif plotType == 'elines':
@@ -165,7 +165,6 @@ def pickColorMap(plotType):
 
 
 def spatiallyResolvedPlot(galaxy, plotType, newFileName, dataInd, slice, hex_at_Cen, gal_at_Cen, vmax, vmin, axes):
-
     axes.set_title('Spatially Resolved', fontsize=fontsize +
                    5, weight='bold', y=1.01)
 
@@ -204,12 +203,20 @@ def spatiallyResolvedPlot(galaxy, plotType, newFileName, dataInd, slice, hex_at_
     axes.set_facecolor('grey')
 
     if plotType == 'WHAN' or plotType.startswith('BPT'):
+        # MIGUEL TODO
         cbar = plt.colorbar()
-        cbar.set_ticks([4.0 / 3, 2, 8.0 / 3])
+        tickPos = [x / 3 for x in [4, 6, 8]]
+        if plotType.startswith('BPT') and plotType.endswith('[NII]'):
+            tickPos = [1, 2, 3, 4]
+        cbar.set_ticks(tickPos)
         if plotType.startswith('BPT'):
-            cbar.ax.set_yticklabels(['SF', 'Sy', 'Inter'], weight='bold')
+            tickLbl = ['SF', 'Sy', 'LINER']
+            if plotType.endswith('[NII]'):
+                tickLbl.append('Composite')
+            cbar.ax.set_yticklabels(tickLbl, weight='bold')
         elif plotType == 'WHAN':
             cbar.ax.set_yticklabels(['SF', 'AGN', 'old stars'], weight='bold')
+        
         cbar.ax.tick_params(labelsize=fontsize)
 
     else:

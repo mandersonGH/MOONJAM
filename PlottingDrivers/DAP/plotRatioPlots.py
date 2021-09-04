@@ -17,6 +17,8 @@ import Utilities.helperFuncs as hF
 import Utilities.mathFuncs as mF
 import PlottingTools.drawOnPlots as dOP
 
+import bptClassifications as bpt
+
 from EmissionLine.EmissionLineSlice import EmissionLineSlice
 np.seterr(divide='ignore', invalid='ignore')
 
@@ -95,8 +97,8 @@ def plotRatioPlots(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP):
     if save_as_eps:
         axes3.set_rasterized(True)
     fig.tight_layout()
-    # plt.show()
-    # print(jello)
+    plt.show()
+    print(jello)
     if save_as_eps:
         plt.savefig(os.path.join(nFP, galaxy.PLATEIFU + '_' +
             plotType + '_NO_IM.eps'), bbox_inches='tight', format='eps')
@@ -260,7 +262,6 @@ def calculate_AxisMats(hdu, emLineInd, Top, Bot, TopMatInd, BotMatInd, Mat_type)
         Mat = TopMat
     return Mat
 
-
 def processRatioData(plotType, xMat, yMat, dMat, mask):
     """
     Creates scatter array for plotting
@@ -271,7 +272,19 @@ def processRatioData(plotType, xMat, yMat, dMat, mask):
     d = []
     labelMat = np.zeros(xMat.shape)
 
-    counts = np.zeros(4)
+    counts = np.zeros(5 if plotType.endswith('[NII]') else 4)
+
+    # These magic numbers are how we plot different colors
+    # in the spatiallyResolvedPlot for the different definitions
+    if plotType.startswith('BPT'):
+        isStarForming = 1
+        isSeyfert = 2
+        isLiner = 3
+        isComposite = 4 # only NII
+    elif plotType == 'WHAN':
+        isStarForming = 1
+        isAgn = 2
+        isOldStars = 3
 
     for i in range(xMat.shape[0]):
         for j in range(xMat.shape[1]):
@@ -281,23 +294,21 @@ def processRatioData(plotType, xMat, yMat, dMat, mask):
                     y.append(yMat[i, j])
                     d.append(dMat[i, j])
                 if plotType.startswith('BPT'):
-                    lowerLineYval = (0.61 / (xMat[i, j] - 0.05) + 1.3)
-                    upperLineYval = (0.61 / (xMat[i, j] - 0.47) + 1.19)
-                    if yMat[i, j] < lowerLineYval and xMat[i, j] < 0.05:
-                        # print((xMat[i, j], yMat[i, j], lowerLineYval))
-                        labelMat[i, j] = 1
-                    elif yMat[i, j] > upperLineYval:
-                        labelMat[i, j] = 2
-                    else:
-                        labelMat[i, j] = 3
+                    if bpt.isComposite(plotType, xMat[i, j], yMat[i, j]):
+                        labelMat[i, j] = isComposite
+                    elif bpt.isStarForming(plotType, xMat[i, j], yMat[i, j]):
+                        labelMat[i, j] = isStarForming
+                    elif bpt.isSeyfert(plotType, xMat[i, j], yMat[i, j]):
+                        labelMat[i, j] = isSeyfert
+                    elif bpt.isLINER(plotType, xMat[i, j], yMat[i, j]):
+                        labelMat[i, j] = isLiner
                 elif plotType == 'WHAN':
                     if yMat[i, j] < .5:
-                        # Old Stars
-                        labelMat[i, j] = 3
+                        labelMat[i, j] = isOldStars
                     elif xMat[i, j] < -.4:
-                        labelMat[i, j] = 1
+                        labelMat[i, j] = isStarForming
                     else:
-                        labelMat[i, j] = 2
+                        labelMat[i, j] = isAgn
                 if labelMat[i, j] == round(labelMat[i, j]):
                     # aka isInt
                     counts[int(labelMat[i, j])] += 1
@@ -317,54 +328,23 @@ def createBptDesignationLines(plotType, xmin):
     y2 = []
     y3 = [] # [N11] only
 
+    x1min, x1max = bpt.maxStarburstClassificationLineXBounds(plotType)
+    x2min, x2max = bpt.seyfertLinerClassificationLineXBounds(plotType)
+    x3min, x3max = bpt.pureStarformingClassificationLineXBounds(plotType)
+
     for i in np.linspace(xmin, 2, 100):
+        if(x1min < i and i < x1max):
+            x1.append(i)
+            y1.append(bpt.maxStarburstClassificationLine(plotType, i))
 
-        if plotType.endswith('[NII]'):
+        if(x2min < i and i < x2max):
+            x2.append(i)
+            y2.append(bpt.seyfertLinerClassificationLine(plotType, i))
 
-            if(i < 0.05):
-                # between:
-                #   lower  x's: SF and Seyfert
-                #   higher x's: SF and composite
-                x1.append(i)
-                y1.append(0.61 / (i - 0.05) + 1.3)
+        if plotType.endswith('[NII]') and x3min < i and i < x3max:
+            x3.append(i)
+            y3.append(bpt.pureStarformingClassificationLine(plotType, i))
 
-            if(i > -0.26):
-                # between LINER and Seyfert
-                x2.append(i)
-                y2.append(1.89 * i + 0.76) # TODO fix
-
-            if(-1.2805 < i and i < 0.47):
-                # between Composite and LINER
-                x3.append(i)
-                y3.append(0.61 / (i - 0.47) + 1.19)
-
-        elif plotType.endswith('[SII]'):
-
-            if(i < 0.32):
-                # between:
-                #   lower  x's: SF and Seyfert
-                #   higher x's: SF and LINER
-                x1.append(i)
-                y1.append(0.72 / (i - 0.32) + 1.3)
-
-            if(i > -0.33):
-                # between LINER and Seyfert
-                x2.append(i)
-                y2.append(1.89 * i + 0.76)
-
-        elif plotType.endswith('[OI]'):
-
-            if(-2 < i and i < -0.6):
-                # between:
-                #   lower  x's: SF and Seyfert
-                #   higher x's: SF and LINER
-                x1.append(i)
-                y1.append(0.73 / (i + 0.59) + 1.33)
-
-            if(i > -1.14646): # 46 repeating
-                # between LINER and Seyfert
-                x2.append(i)
-                y2.append(1.18 * i + 1.3)
     return x1, x2, x3, y1, y2, y3
 
 def ratioAxes(plotType, emLineFancy, x, y, d, labels, axes):
