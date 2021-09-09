@@ -24,20 +24,6 @@ np.seterr(divide='ignore', invalid='ignore')
 
 re_colors = ['olive', 'tomato', 'darkturquoise', 'purple']
 
-"""
-BPT Diagrams
-
-for diagram 1: [OII]/H-beta on the y and [NII]/H-alpha on the x
-    Note: included "Composite" section
-for diagram 2: [OII]/H-beta on the y and [SII]/ H-alpha on the x
-for diagram 3: [OII]/H-beta on the y and [OI] / H-alpha on the x
-
-we have multiple wavelengths for some of these emission lines. Use:
-[NII] = 6585
-[OI] = 6302
-[SII] = THE SUM OF both 6732 and 6718. ( I dunno why though. Just one of those stupid things.)
-"""
-
 def plotRatioPlots(EADir, galaxy, plotType, emLineInd, emLineFancy, nFP):
     print("plotRatioPlots("+galaxy.PLATEIFU+")")
     dataInd = 1
@@ -419,13 +405,13 @@ def ratioAxes(plotType, emLineFancy, x, y, d, labels, axes):
         axes.annotate('Sy', xy=(0.1, 0.85), xytext=(0.1, 0.85), textcoords='axes fraction',
                       color='orange', fontsize=annotationSize, weight='bold')
 
-        axes.annotate('LINER', xy=(0.3, 0.65),
+        axes.annotate('LINER', xy=(0.3, 0.55),
                           color='green', fontsize=annotationSize, weight='bold')
 
         if plotType.endswith('[NII]'):
             y_lastAnno = ymin + (ymax - ymin) * 0.1
             x_lastAnno = x1[mF.findIndex(y1, y_lastAnno)] + 0.05
-            axes.annotate('Composite', xy=(x_lastAnno, y_lastAnno),
+            axes.annotate('Comp', xy=(x_lastAnno, y_lastAnno),
                           color='yellowgreen', fontsize=annotationSize, weight='bold')
     elif plotType == 'WHAN':
         axes.annotate('SF', xy=(0.1, 0.9), xytext=(0.1, 0.9), textcoords='axes fraction',

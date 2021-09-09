@@ -1,5 +1,15 @@
 """
 BPT classifications
+
+for diagram 1: [OII]/H-beta on the y and [NII]/H-alpha on the x
+    Note: included "Composite" section
+for diagram 2: [OII]/H-beta on the y and [SII]/ H-alpha on the x
+for diagram 3: [OII]/H-beta on the y and [OI] / H-alpha on the x
+
+we have multiple wavelengths for some of these emission lines. Use:
+[NII] = 6585
+[OI] = 6302
+[SII] = THE SUM OF both 6732 and 6718. ( I dunno why though. Just one of those stupid things.)
 """
 
 def isStarForming(plotType, x, y):
